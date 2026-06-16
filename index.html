@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraguel Rock - Setlist Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            body { background: white; color: black; font-size: 11pt; }
+            #app-container, button, form, nav, .no-print, [id^="modal-"], .filtro-contenedor { display: none !important; }
+            #seccion-impresion { display: block !important; width: 100%; height: 100%; }
+            @page { size: A4 portrait; margin: 15mm; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border-bottom: 1px solid #000; padding: 8px 10px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            .enlazado-print { background-color: #f1f5f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; border-left: 4px solid #4f46e5 !important; }
+            .enlazado-print-fin { border-bottom: 2px solid #000 !important; }
+        }
+        #seccion-impresion { display: none; }
+        .linea-enlace { position: relative; }
+        .linea-enlace::after {
+            content: "🔗 Enlazada con la siguiente";
+            position: absolute;
+            bottom: -14px;
+            left: 32px;
+            font-size: 9px;
+            font-weight: bold;
+            color: #4f46e5;
+            background: #e0e7ff;
+            padding: 1px 6px;
+            border-radius: 4px;
+            z-index: 10;
+        }
+        .elemento-arrastrable { cursor: grab; user-select: none; }
+        .elemento-arrastrable:active { cursor: grabbing; }
+        .elemento-arrastrable.arrastrando { opacity: 0.4; background-color: #e0e7ff !important; border: 2px dashed #4f46e5 !important; }
+        .elemento-arrastrable.sobre-vuelo { border-top: 4px solid #4f46e5 !important; transition: border 0.15s ease-in-out; }
+        
+        /* Animación suave para los pulsos del metrónomo */
+        .bola-pulso { transition: background-color 0.05s ease-out, transform 0.05s ease-out; }
+        
+        /* Ajustes dinámicos para el modo pantalla completa nativo o forzado por CSS */
+        .metro-fullscreen {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 1000 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-height: 100vh !important;
+            border-radius: 0px !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <div id="app-container" class="container mx-auto px-4 py-6 max-w-full flex-grow">
+        
+        <header class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4 bg-gradient-to-r from-indigo-900 to-indigo-700 p-6 rounded-xl text-white shadow-md">
+            <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                <img src="WhatsApp Image 2026-06-16 at 16.20.44.jpeg" alt="Fraguel Rock Logo" class="w-20 h-20 object-contain rounded-full bg-white p-1 shadow-inner">
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight text-yellow-400">Fraguel Rock</h1>
+                    <p class="text-indigo-200 text-xs font-medium mt-1">Listado Temas y Repertorio de la mejor banda que jamás tus ojos vieron</p>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 w-full md:w-auto justify-center">
+                <button onclick="abrirModalBaseGeneral()" class="bg-indigo-600 border border-indigo-400 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-500 transition text-xs">
+                    🎵 Listado Canciones (Base)
+                </button>
+                <button onclick="abrirModalRepertorios()" class="bg-indigo-950 border border-indigo-800 text-indigo-200 px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-900 transition text-xs">
+                    📂 Mis Repertorios
+                </button>
+            </div>
+        </header>
+
+        <div class="bg-indigo-50/50 p-3 rounded-lg mb-4 text-center border border-indigo-100/80">
+            <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider">Repertorio en elaboration:</span>
+            <span id="nombre-rep-actual" class="text-sm font-black text-indigo-600 ml-1">Nuevo Repertorio</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 flex flex-col h-[600px]">
+                <div class="border-b pb-3 mb-3">
+                    <h3 class="font-black text-gray-700 uppercase tracking-wider text-xs mb-2">1. Añadir al repertorio</h3>
+                    <div class="relative filtro-contenedor">
+                        <input type="text" id="buscador-canciones" oninput="filtrarCancionesSelector()" placeholder="🔍 Buscar canción por título o tono..." class="w-full p-2 pl-8 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
+                    </div>
+                </div>
+                <div id="lista-selector-repertorio" class="space-y-2 overflow-y-auto flex-grow pr-1"></div>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 flex flex-col h-[600px] justify-between">
+                <div class="flex flex-col h-[480px]">
+                    <div class="flex justify-between items-center mb-3 border-b pb-2">
+                        <h3 class="font-black text-gray-700 uppercase tracking-wider text-xs">2. Estructura del Setlist <span class="text-[10px] text-gray-400 font-normal block sm:inline sm:ml-2">(Arrastra para ordenar)</span></h3>
+                        <div class="text-right">
+                            <span class="text-[10px] uppercase text-gray-400 font-bold block">Duración Total</span>
+                            <div id="tiempo-total" class="text-lg font-black text-emerald-600">00:00:00</div>
+                        </div>
+                    </div>
+                    <div id="lista-setlist-final" class="space-y-3 overflow-y-auto flex-grow pr-1 pb-4"></div>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t">
+                    <button onclick="guardarRepertorioActual()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 transition text-xs uppercase tracking-wider shadow-sm">
+                        💾 Guardar / Actualizar Repertorio
+                    </button>
+                    <button id="btn-imprimir" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition uppercase tracking-wider text-sm hidden shadow-md">
+                        🖨️ Imprimir en un Folio (A4)
+                    </button>
+                </div>
+            </div>
+
+            <div id="contenedor-columna-metro" class="bg-slate-900 p-5 rounded-xl shadow-md border border-slate-800 flex flex-col h-[600px] text-white transition-all duration-300">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
+                    <div>
+                        <h3 class="font-black text-yellow-400 uppercase tracking-wider text-xs">3. Modo Metrónomo</h3>
+                        <p class="text-slate-400 text-[10px] mt-0.5">Control e indicadores visuales de tiempo para directo.</p>
+                    </div>
+                    <button onclick="conmutarPantallaCompleta()" title="Alternar pantalla completa" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg border border-slate-700 font-bold text-xs transition">
+                        🔲 Pantalla Completa
+                    </button>
+                </div>
+                
+                <div id="playlist-metronomo" class="space-y-2 overflow-y-auto flex-grow pr-1 mb-4"></div>
+
+                <div class="flex justify-center items-center gap-6 py-4 bg-slate-950/40 rounded-xl border border-slate-800/60 mb-3 shadow-inner">
+                    <div id="bola-1" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                    <div id="bola-2" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                    <div id="bola-3" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                    <div id="bola-4" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                </div>
+
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
+                    <div class="text-center mb-3">
+                        <p id="metro-player-titulo" class="text-xs font-bold text-slate-400 truncate">Ningún tema seleccionado</p>
+                        <p id="metro-player-bpm" class="text-2xl font-black text-yellow-400 mt-0.5">-- <span class="text-xs text-slate-500 font-normal">BPM</span></p>
+                    </div>
+                    <div class="flex justify-center items-center gap-4">
+                        <button onclick="retrocederTemaMetro()" title="Canción anterior" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 flex items-center justify-center font-bold text-lg transition text-slate-200">
+                            ⏮
+                        </button>
+                        <button id="btn-metro-player-toggle" onclick="conmutarPlayPlayerMetro()" title="Iniciar / Detener" class="w-16 h-16 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 flex items-center justify-center font-black text-2xl transition shadow-lg text-white">
+                            ▶
+                        </button>
+                        <button onclick="avanzarTemaMetro()" title="Siguiente canción" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 flex items-center justify-center font-bold text-lg transition text-slate-200">
+                            ⏭
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="modal-base-general" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-40">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl h-[85vh] flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="text-xl font-black text-gray-800">🎵 Base de Datos General</h3>
+                    <div class="flex gap-4 text-xs items-center">
+                        <button onclick="exportarDatos()" class="text-gray-500 hover:text-indigo-600 font-bold">📥 Copia para NAS</button>
+                        <label class="text-gray-500 hover:text-indigo-600 font-bold cursor-pointer">
+                            📤 Cargar de NAS <input type="file" id="file-nas" accept=".json" class="hidden" onchange="importarDatos(event)">
+                        </label>
+                        <button onclick="cerrarModalBaseGeneral()" class="text-gray-400 hover:text-gray-600 text-xl font-black ml-2">✕</button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-xs text-gray-500">Añade o modifica las canciones que Fraguel Rock tiene ensayadas.</p>
+                    <button onclick="abrirModalNueva()" class="bg-yellow-400 text-indigo-950 px-3 py-1.5 rounded-lg font-bold shadow hover:bg-yellow-300 transition text-xs">
+                        ➕ Nueva Canción
+                    </button>
+                </div>
+            </div>
+            <div id="lista-general-completa" class="space-y-2 overflow-y-auto flex-grow my-2 pr-1"></div>
+            <div class="text-right border-t pt-3">
+                <button onclick="cerrarModalBaseGeneral()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-200">Cerrar Ventana</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-cancion" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
+            <h3 id="modal-titulo" class="text-xl font-bold text-gray-800 mb-4">Añadir Canción</h3>
+            <form id="form-cancion" class="space-y-4">
+                <input type="hidden" id="edit-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase">Título</label>
+                    <input type="text" id="titulo" required class="w-full mt-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Tonalidad</label>
+                        <input type="text" id="tonalidad" placeholder="Am" required class="w-full mt-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">BPM</label>
+                        <input type="text" id="tempo" placeholder="120 o -" required class="w-full mt-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase">Duración</label>
+                        <input type="text" id="duracion" placeholder="04:15" pattern="[0-9]{2}:[0-9]{2}" title="MM:SS" required class="w-full mt-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="cerrarModal()" class="w-1/2 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-200">Cancelar</button>
+                    <button type="submit" class="w-1/2 bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-repertorios" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-40">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-xl font-bold text-gray-800">📂 Repertorios Almacenados</h3>
+                <button onclick="cerrarModalRepertorios()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">✕</button>
+            </div>
+            <div id="lista-repertorios-guardados" class="space-y-3 max-h-96 overflow-y-auto pr-1"></div>
+            <div class="mt-4 pt-3 border-t text-right">
+                <button onclick="nuevoRepertorioLimpio()" class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-2 rounded-lg font-bold hover:bg-emerald-100 text-xs">
+                    ✨ Crear Uno Nuevo desde Cero
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="seccion-impresion">
+        <h1 id="print-titulo-rep" style="font-size: 24pt; font-weight: 800; margin-bottom: 2px; text-align: center; letter-spacing: -1px;">FRAGUEL ROCK</h1>
+        <p id="print-info-total" style="text-align: center; font-weight: bold; margin-bottom: 20px; color: #333; font-size: 11pt; border-bottom: 2px solid #000; padding-bottom: 5px;"></p>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%; text-align: center;">Nº</th>
+                    <th style="width: 62%">Título del Tema</th>
+                    <th style="width: 15%; text-align: center;">Tono</th>
+                    <th style="width: 15%; text-align: center;">Tempo</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-impresion-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 💡 COPIA DE RESPALDO AUTOMÁTICA (PARA COMPARTIR CON LA BANDA)
+        // Pega el contenido de tu 'fraguel_rock_backup.json' entre las llaves {} de abajo.
+        // Ejemplo: const COPIA_RESPALDO_AUTOMATICA = {"canciones":[...], "repertorios":[...]};
+        // =========================================================================
+        const COPIA_RESPALDO_AUTOMATICA = null;
+
+        // --- INICIALIZACIÓN DE DATOS (CON CARGA PREVIA) ---
+        if (!localStorage.getItem('FR_canciones') && !localStorage.getItem('FR_repertorios') && COPIA_RESPALDO_AUTOMATICA) {
+            if (COPIA_RESPALDO_AUTOMATICA.canciones) localStorage.setItem('FR_canciones', JSON.stringify(COPIA_RESPALDO_AUTOMATICA.canciones));
+            if (COPIA_RESPALDO_AUTOMATICA.repertorios) localStorage.setItem('FR_repertorios', JSON.stringify(COPIA_RESPALDO_AUTOMATICA.repertorios));
+        }
+
+        let cancionesGeneral = JSON.parse(localStorage.getItem('FR_canciones')) || [];
+        let repertoriosGuardados = JSON.parse(localStorage.getItem('FR_repertorios')) || [];
+        
+        let repertorioActual = {
+            id: null,
+            nombre: "Nuevo Repertorio",
+            canciones: [], 
+        };
+
+        // --- SISTEMA DE METRÓNOMO AUDIO Y VISUAL ---
+        let audioCtx = null;
+        let metronomoIntervalo = null;
+        let tiempoActualMetronomo = 0;
+        let indiceSetlistSonando = null; 
+        let wakeLock = null; // Control de bloqueo de pantalla apagada
+
+        // Función auxiliar para parsear tempos nulos safely
+        function obtenerBpmNumerico(valor) {
+            if (!valor || valor === '-' || valor === '0' || valor === 0) return 0;
+            const num = Number(valor);
+            return isNaN(num) ? 0 : num;
+        }
+
+        async function activarBloqueoPantalla() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) {
+                console.log("Wake Lock no soportado o denegado.");
+            }
+        }
+
+        function desactivarBloqueoPantalla() {
+            if (wakeLock !== null) {
+                wakeLock.release();
+                wakeLock = null;
+            }
+        }
+
+        function refrescarBolasVisuales(pulsoActivo, esSilencioso = false) {
+            // Reseteamos todas las bolas a su estado apagado base
+            for (let i = 1; i <= 4; i++) {
+                const bola = document.getElementById(`bola-${i}`);
+                if (bola) {
+                    bola.classList.remove('bg-yellow-400', 'border-yellow-300', 'scale-110', 'bg-orange-500', 'border-orange-400');
+                    bola.classList.add('bg-slate-800', 'border-slate-700');
+                }
+            }
+
+            if (esSilencioso || pulsoActivo === null) return;
+
+            // Calculamos cuál bola encender en base a un compás de 4 pulsos (1 a 4)
+            const bolaAEncender = (pulsoActivo % 4) + 1;
+            const targetBola = document.getElementById(`bola-${bolaAEncender}`);
+            
+            if (targetBola) {
+                targetBola.classList.remove('bg-slate-800', 'border-slate-700');
+                if (bolaAEncender === 1) {
+                    // Primer tiempo fuerte: Amarillo destellante
+                    targetBola.classList.add('bg-yellow-400', 'border-yellow-300', 'scale-110');
+                } else {
+                    // Tiempos débiles: Naranja brillante (Como la captura solicitada)
+                    targetBola.classList.add('bg-orange-500', 'border-orange-400');
+                }
+            }
+        }
+
+        function conmutarMetronomoPorIndice(index) {
+            if (index === null || index < 0 || index >= repertorioActual.canciones.length) {
+                detenerMetronomo();
+                renderPlaylistMetronomo();
+                return;
+            }
+
+            if (indiceSetlistSonando === index) {
+                detenerMetronomo();
+                renderPlaylistMetronomo();
+                return;
+            }
+
+            if (metronomoIntervalo) detenerMetronomo();
+
+            const itemSetlist = repertorioActual.canciones[index];
+            const cancionDatos = cancionesGeneral.find(c => c.id === itemSetlist.id);
+            if (!cancionDatos) return;
+
+            indiceSetlistSonando = index;
+            tiempoActualMetronomo = 0;
+            
+            const bpm = obtenerBpmNumerico(cancionDatos.tempo);
+
+            // MODO MUDO / SILENCIOSO si el tempo es 0 o '-'
+            if (bpm === 0) {
+                activarBloqueoPantalla();
+                refrescarBolasVisuales(null, true); 
+                renderPlaylistMetronomo();
+                return; 
+            }
+
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            activarBloqueoPantalla();
+            const intervaloMs = (60 / bpm) * 1000;
+
+            function reproducirGolpe() {
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                // Actualizar la interfaz visual de las 4 bolas
+                refrescarBolasVisuales(tiempoActualMetronomo);
+
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                if (tiempoActualMetronomo % 4 === 0) {
+                    osc.frequency.setValueAtTime(1000, audioCtx.currentTime); // Acento
+                } else {
+                    osc.frequency.setValueAtTime(750, audioCtx.currentTime);  // Normal
+                }
+
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.09);
+
+                tiempoActualMetronomo++;
+            }
+
+            reproducirGolpe();
+            metronomoIntervalo = setInterval(reproducirGolpe, intervaloMs);
+            renderPlaylistMetronomo();
+        }
+
+        function conmutarMetronomoSuelto(idCancion, valorTempo) {
+            const idxEnSetlist = repertorioActual.canciones.findIndex(item => item.id === idCancion);
+            if (idxEnSetlist !== -1) {
+                conmutarMetronomoPorIndice(idxEnSetlist);
+            } else {
+                if (indiceSetlistSonando === `asislado-${idCancion}`) {
+                    detenerMetronomo();
+                    renderPlaylistMetronomo();
+                    return;
+                }
+                if (metronomoIntervalo) detenerMetronomo();
+                
+                const bpm = obtenerBpmNumerico(valorTempo);
+                indiceSetlistSonando = `asislado-${idCancion}`;
+                tiempoActualMetronomo = 0;
+
+                if (bpm === 0) {
+                    refrescarBolasVisuales(null, true);
+                    renderPlaylistMetronomo();
+                    return;
+                }
+                
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                activarBloqueoPantalla();
+                
+                const intervaloMs = (60 / bpm) * 1000;
+                function reproducirGolpeAislado() {
+                    if (!audioCtx) return;
+                    refrescarBolasVisuales(tiempoActualMetronomo);
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(tiempoActualMetronomo % 4 === 0 ? 1000 : 750, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.09);
+                    tiempoActualMetronomo++;
+                }
+                reproducirGolpeAislado();
+                metronomoIntervalo = setInterval(reproducirGolpeAislado, intervaloMs);
+                renderPlaylistMetronomo();
+            }
+        }
+
+        function detenerMetronomo() {
+            if (metronomoIntervalo) {
+                clearInterval(metronomoIntervalo);
+                metronomoIntervalo = null;
+            }
+            indiceSetlistSonando = null;
+            desactivarBloqueoPantalla();
+            refrescarBolasVisuales(null, true);
+        }
+
+        function retrocederTemaMetro() {
+            if (repertorioActual.canciones.length === 0) return;
+            let nuevoIdx = 0;
+            if (typeof indiceSetlistSonando === 'number') {
+                nuevoIdx = indiceSetlistSonando - 1;
+                if (nuevoIdx < 0) nuevoIdx = repertorioActual.canciones.length - 1;
+            }
+            indiceSetlistSonando = null;
+            conmutarMetronomoPorIndice(nuevoIdx);
+        }
+
+        function avanzarTemaMetro() {
+            if (repertorioActual.canciones.length === 0) return;
+            let nuevoIdx = 0;
+            if (typeof indiceSetlistSonando === 'number') {
+                nuevoIdx = indiceSetlistSonando + 1;
+                if (nuevoIdx >= repertorioActual.canciones.length) nuevoIdx = 0;
+            }
+            indiceSetlistSonando = null;
+            conmutarMetronomoPorIndice(nuevoIdx);
+        }
+
+        function conmutarPlayPlayerMetro() {
+            if (repertorioActual.canciones.length === 0) return;
+            if (typeof indiceSetlistSonando === 'number') {
+                conmutarMetronomoPorIndice(indiceSetlistSonando);
+            } else {
+                conmutarMetronomoPorIndice(0);
+            }
+        }
+
+        // --- CONTROL PANTALLA COMPLETA ---
+        function conmutarPantallaCompleta() {
+            const columnaMetro = document.getElementById('contenedor-columna-metro');
+            if (!document.fullscreenElement) {
+                columnaMetro.classList.add('metro-fullscreen');
+                // Intentamos maximizar por API nativa si el navegador lo permite
+                if (columnaMetro.requestFullscreen) {
+                    columnaMetro.requestFullscreen().catch(() => {});
+                }
+            } else {
+                document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        // Listener para limpiar clases CSS si se sale usando la tecla Escape nativa
+        document.addEventListener('fullscreenchange', () => {
+            const columnaMetro = document.getElementById('contenedor-columna-metro');
+            if (!document.fullscreenElement) {
+                columnaMetro.classList.remove('metro-fullscreen');
+            }
+        });
+
+
+        // --- MANEJO DE INTERFAZ Y MODALES ---
+        const modalBaseGeneral = document.getElementById('modal-base-general');
+        const modalCancion = document.getElementById('modal-cancion');
+        const modalRepertorios = document.getElementById('modal-repertorios');
+        const formCancion = document.getElementById('form-cancion');
+        const tiempoTotalEl = document.getElementById('tiempo-total');
+        const btnImprimir = document.getElementById('btn-imprimir');
+
+        let indiceArrastrado = null;
+
+        function abrirModalBaseGeneral() { modalBaseGeneral.classList.remove('hidden'); renderBaseGeneralList(); }
+        function cerrarModalBaseGeneral() { modalBaseGeneral.classList.add('hidden'); }
+
+        function abrirModalNueva() {
+            document.getElementById('modal-titulo').textContent = "Añadir a Base General";
+            formCancion.reset();
+            document.getElementById('edit-id').value = "";
+            modalCancion.classList.remove('hidden');
+        }
+
+        function abrirModalEditar(id) {
+            const cancion = cancionesGeneral.find(c => c.id === id);
+            if (!cancion) return;
+            document.getElementById('modal-titulo').textContent = "Editar Canción";
+            document.getElementById('edit-id').value = cancion.id;
+            document.getElementById('titulo').value = cancion.titulo;
+            document.getElementById('tonalidad').value = cancion.tonalidad;
+            document.getElementById('tempo').value = cancion.tempo;
+            document.getElementById('duracion').value = cancion.duracion;
+            modalCancion.classList.remove('hidden');
+        }
+
+        function cerrarModal() { modalCancion.classList.add('hidden'); }
+
+        formCancion.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const idEditando = document.getElementById('edit-id').value;
+            const datos = {
+                titulo: document.getElementById('titulo').value,
+                tonalidad: document.getElementById('tonalidad').value,
+                tempo: document.getElementById('tempo').value, // Guardado como String para admitir '-'
+                duracion: document.getElementById('duracion').value
+            };
+
+            if (idEditando) {
+                const idx = cancionesGeneral.findIndex(c => c.id == idEditando);
+                if (idx !== -1) cancionesGeneral[idx] = { id: Number(idEditando), ...datos };
+            } else {
+                cancionesGeneral.push({ id: Date.now(), ...datos });
+            }
+            localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
+            cerrarModal();
+            renderBaseGeneralList();
+            render();
+        });
+
+        function eliminarCancionGeneral(id) {
+            if(confirm("¿Quitar esta canción de la base de datos de Fraguel Rock? Se borrará de todos los repertorios.")) {
+                detenerMetronomo();
+                cancionesGeneral = cancionesGeneral.filter(c => c.id !== id);
+                repertoriosGuardados.forEach(rep => {
+                    rep.canciones = rep.canciones.filter(item => item.id !== id);
+                });
+                repertorioActual.canciones = repertorioActual.canciones.filter(item => item.id !== id);
+                localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
+                localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
+                renderBaseGeneralList();
+                render();
+            }
+        }
+
+        function filtrarCancionesSelector() {
+            const busqueda = document.getElementById('buscador-canciones').value.toLowerCase();
+            const filas = document.querySelectorAll('#lista-selector-repertorio > div');
+            filas.forEach(fila => {
+                const texto = fila.getAttribute('data-search-text');
+                if (texto.includes(busqueda)) fila.classList.remove('hidden');
+                else fila.classList.add('hidden');
+            });
+        }
+
+        function abrirModalRepertorios() {
+            const contenedor = document.getElementById('lista-repertorios-guardados');
+            contenedor.innerHTML = '';
+
+            if (repertoriosGuardados.length === 0) {
+                contenedor.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">No tienes ningún repertorio guardado aún.</p>';
+            } else {
+                repertoriosGuardados.forEach(rep => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-lg border border-gray-200 text-sm";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-gray-800">${rep.nombre}</p>
+                            <p class="text-xs text-gray-500">${rep.canciones.length} temas asignados</p>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="cargarRepertorio(${rep.id})" class="bg-indigo-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs hover:bg-indigo-700">Cargar</button>
+                            <button onclick="duplicarRepertorio(${rep.id})" class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1.5 rounded font-semibold text-xs hover:bg-amber-100">Duplicar</button>
+                            <button onclick="eliminarRepertorio(${rep.id})" class="text-red-500 hover:bg-red-50 p-1.5 rounded font-bold">🗑️</button>
+                        </div>
+                    `;
+                    contenedor.appendChild(div);
+                });
+            }
+            modalRepertorios.classList.remove('hidden');
+        }
+
+        function cerrarModalRepertorios() { modalRepertorios.classList.add('hidden'); }
+
+        function nuevoRepertorioLimpio() {
+            detenerMetronomo();
+            repertorioActual = { id: null, nombre: "Nuevo Repertorio", canciones: [] };
+            cerrarModalRepertorios();
+            render();
+        }
+
+        function guardarRepertorioActual() {
+            if (repertorioActual.canciones.length === 0) {
+                alert("Añade al menos una canción al repertorio antes de guardarlo.");
+                return;
+            }
+
+            let nuevoNombre = prompt("Nombre del repertorio:", repertorioActual.id ? repertorioActual.nombre : "");
+            if (nuevoNombre === null) return;
+            if (nuevoNombre.trim() === "") nuevoNombre = "Repertorio sin nombre";
+
+            repertorioActual.nombre = nuevoNombre;
+
+            if (repertorioActual.id) {
+                const idx = repertoriosGuardados.findIndex(r => r.id === repertorioActual.id);
+                if (idx !== -1) repertoriosGuardados[idx] = { ...repertorioActual };
+            } else {
+                repertorioActual.id = Date.now();
+                repertoriosGuardados.push({ ...repertorioActual });
+            }
+
+            localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
+            render();
+            alert("¡Repertorio guardado correctamente!");
+        }
+
+        function cargarRepertorio(id) {
+            detenerMetronomo();
+            const rep = repertoriosGuardados.find(r => r.id === id);
+            if (!rep) return;
+            let cancionesMigradas = rep.canciones.map(item => {
+                return typeof item === 'object' ? item : { id: item, enlazada: false };
+            });
+            repertorioActual = JSON.parse(JSON.stringify(rep));
+            repertorioActual.canciones = cancionesMigradas;
+            cerrarModalRepertorios();
+            render();
+        }
+
+        function duplicarRepertorio(id) {
+            const rep = repertoriosGuardados.find(r => r.id === id);
+            if (!rep) return;
+            repertorioActual = JSON.parse(JSON.stringify(rep));
+            repertorioActual.id = null;
+            repertorioActual.nombre = `${repertorioActual.nombre} (Copia)`;
+            repertorioActual.canciones = repertorioActual.canciones.map(item => {
+                return typeof item === 'object' ? item : { id: item, enlazada: false };
+            });
+            cerrarModalRepertorios();
+            render();
+            alert("Has cargado una copia. Modifica lo que quieras y dale a guardar para registrarlo con otro nombre.");
+        }
+
+        function eliminarRepertorio(id) {
+            if (confirm("¿Estás seguro de que quieres eliminar este repertorio guardado?")) {
+                repertoriosGuardados = repertoriosGuardados.filter(r => r.id !== id);
+                localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
+                if (repertorioActual.id === id) nuevoRepertorioLimpio();
+                abrirModalRepertorios();
+            }
+        }
+
+        function agregarAlRepertorio(id) { 
+            repertorioActual.canciones.push({ id: id, enlazada: false }); 
+            render(); 
+        }
+        
+        function quitarDelRepertorio(index) { 
+            if (indiceSetlistSonando === index) detenerMetronomo();
+            else if (typeof indiceSetlistSonando === 'number' && indiceSetlistSonando > index) indiceSetlistSonando--;
+            repertorioActual.canciones.splice(index, 1); 
+            render(); 
+        }
+
+        function conmutarEnlace(index) {
+            repertorioActual.canciones[index].enlazada = !repertorioActual.canciones[index].enlazada;
+            render();
+        }
+        
+        function moverCancion(index, direccion) {
+            const arr = repertorioActual.canciones;
+            let destino = null;
+            if (direccion === 'subir' && index > 0) destino = index - 1;
+            if (direccion === 'bajar' && index < arr.length - 1) destino = index + 1;
+            
+            if (destino !== null) {
+                if (indiceSetlistSonando === index) indiceSetlistSonando = destino;
+                else if (indiceSetlistSonando === destino) indiceSetlistSonando = index;
+                [arr[index], arr[destino]] = [arr[destino], arr[index]];
+                render();
+            }
+        }
+
+        function iniciarArrastre(e, index) {
+            indiceArrastrado = index;
+            e.target.classList.add('arrastrando');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function finalizarArrastre(e) {
+            e.target.classList.remove('arrastrando');
+            document.querySelectorAll('.elemento-arrastrable').forEach(el => el.classList.remove('sobre-vuelo'));
+        }
+
+        function alEntrarElemento(e) {
+            e.preventDefault();
+            const filaTarget = e.target.closest('.elemento-arrastrable');
+            if (filaTarget) filaTarget.classList.add('sobre-vuelo');
+        }
+
+        function alSalirElemento(e) {
+            const filaTarget = e.target.closest('.elemento-arrastrable');
+            if (filaTarget) filaTarget.classList.remove('sobre-vuelo');
+        }
+
+        function soltarSobreElemento(e, indiceDestino) {
+            e.preventDefault();
+            const filaTarget = e.target.closest('.elemento-arrastrable');
+            if (filaTarget) filaTarget.classList.remove('sobre-vuelo');
+            if (indiceArrastrado === null || indiceArrastrado === indiceDestino) return;
+            
+            const arr = repertorioActual.canciones;
+            const elementoMovido = arr.splice(indiceArrastrado, 1)[0];
+            arr.splice(indiceDestino, 0, elementoMovido);
+            
+            if (indiceSetlistSonando === indiceArrastrado) {
+                indiceSetlistSonando = indiceDestino;
+            } else {
+                if (indiceArrastrado < indiceSetlistSonando && indiceDestino >= indiceSetlistSonando) indiceSetlistSonando--;
+                else if (indiceArrastrado > indiceSetlistSonando && indiceDestino <= indiceSetlistSonando) indiceSetlistSonando++;
+            }
+            indiceArrastrado = null;
+            render();
+        }
+
+        function calcularTiempoTotal() {
+            let segundosTotales = 0;
+            repertorioActual.canciones.forEach(item => {
+                const cancion = cancionesGeneral.find(c => c.id === item.id);
+                if (cancion) {
+                    const [m, s] = cancion.duracion.split(':').map(Number);
+                    segundosTotales += (m * 60) + s;
+                }
+            });
+            const h = Math.floor(segundosTotales / 3600);
+            const m = Math.floor((segundosTotales % 3600) / 60);
+            const s = segundosTotales % 60;
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+
+        function exportarDatos() {
+            const backup = { canciones: cancionesGeneral, repertorios: repertoriosGuardados };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "fraguel_rock_backup.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importarDatos(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    if (datos.canciones && datos.repertorios) {
+                        cancionesGeneral = datos.canciones;
+                        repertoriosGuardados = datos.repertorios;
+                        localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
+                        localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
+                        renderBaseGeneralList();
+                        render();
+                        alert("¡Datos sincronizados desde tu copia con éxito!");
+                    }
+                } catch (err) {
+                    alert("Error al leer el archivo. Asegúrate de que sea el archivo .json correcto.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function renderBaseGeneralList() {
+            const contBase = document.getElementById('lista-general-completa');
+            contBase.innerHTML = '';
+            if (cancionesGeneral.length === 0) {
+                contBase.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Base de datos vacía.</p>';
+            } else {
+                cancionesGeneral.forEach(c => {
+                    const bpmAMostrar = obtenerBpmNumerico(c.tempo) === 0 ? '--' : c.tempo;
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs";
+                    div.innerHTML = `
+                        <div>
+                            <p class="font-bold text-gray-800 text-sm">${c.titulo}</p>
+                            <p class="text-gray-500 font-medium mt-0.5">Tono: <span class="text-indigo-600 font-bold">${c.tonalidad}</span> | Tempo: ${bpmAMostrar} BPM | Duración: ${c.duracion}</p>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="abrirModalEditar(${c.id})" class="bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200 font-semibold">Editar</button>
+                            <button onclick="eliminarCancionGeneral(${c.id})" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 font-semibold">Eliminar</button>
+                        </div>
+                    `;
+                    contBase.appendChild(div);
+                });
+            }
+        }
+
+        // --- RENDERIZADO UNIFICADO MODO METRÓNOMO ---
+        function renderPlaylistMetronomo() {
+            const playlistCont = document.getElementById('playlist-metronomo');
+            const playerTitulo = document.getElementById('metro-player-titulo');
+            const playerBpm = document.getElementById('metro-player-bpm');
+            const btnPlayerToggle = document.getElementById('btn-metro-player-toggle');
+
+            playlistCont.innerHTML = '';
+
+            if (repertorioActual.canciones.length === 0) {
+                playlistCont.innerHTML = '<p class="text-slate-500 text-center py-12 text-xs">Agrega canciones al Setlist para activar la playlist de directo.</p>';
+                playerTitulo.textContent = "Ningún tema seleccionado";
+                playerBpm.innerHTML = `-- <span class="text-xs text-slate-500 font-normal">BPM</span>`;
+                btnPlayerToggle.innerHTML = '▶';
+                btnPlayerToggle.className = "w-16 h-16 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center font-black text-2xl cursor-not-allowed";
+                return;
+            }
+
+            btnPlayerToggle.className = "w-16 h-16 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 flex items-center justify-center font-black text-2xl transition shadow-lg text-white";
+
+            let idxActivoEfectivo = typeof indiceSetlistSonando === 'number' ? indiceSetlistSonando : 0;
+            let cancionActivaDatos = null;
+
+            repertorioActual.canciones.forEach((item, index) => {
+                const c = cancionesGeneral.find(cancion => cancion.id === item.id);
+                if (!c) return;
+
+                const esEsteElSonando = (indiceSetlistSonando === index);
+                if (index === idxActivoEfectivo) cancionActivaDatos = c;
+
+                const divItem = document.createElement('div');
+                if (esEsteElSonando) {
+                    divItem.className = "flex justify-between items-center bg-indigo-950/80 border-2 border-indigo-500 p-2.5 rounded-lg text-xs cursor-pointer shadow-md transition";
+                } else {
+                    divItem.className = "flex justify-between items-center bg-slate-800/60 border border-slate-800 p-2.5 rounded-lg text-xs cursor-pointer hover:bg-slate-800 transition";
+                }
+
+                divItem.onclick = () => conmutarMetronomoPorIndice(index);
+
+                const bpmNumerico = obtenerBpmNumerico(c.tempo);
+                const textoBPM = bpmNumerico === 0 ? '-- BPM' : `${c.tempo} BPM`;
+
+                divItem.innerHTML = `
+                    <div class="truncate mr-2">
+                        <p class="font-bold ${esEsteElSonando ? 'text-yellow-400' : 'text-slate-200'} truncate text-sm">${index + 1}. ${c.titulo}</p>
+                        <p class="text-slate-400 text-[10px] mt-0.5">Tono: ${c.tonalidad}  |  Duración: ${c.duracion}</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="font-black ${esEsteElSonando ? 'text-yellow-400' : 'text-slate-300'} bg-slate-950 px-2 py-0.5 border border-slate-700 rounded text-[10px]">${textoBPM}</span>
+                        <span class="text-sm">${esEsteElSonando && bpmNumerico > 0 ? '⏱️' : '▶'}</span>
+                    </div>
+                `;
+                playlistCont.appendChild(divItem);
+            });
+
+            if (cancionActivaDatos) {
+                const bpmNumerico = obtenerBpmNumerico(cancionActivaDatos.tempo);
+                playerTitulo.textContent = `${idxActivoEfectivo + 1}. ${cancionActivaDatos.titulo}`;
+                playerBpm.innerHTML = bpmNumerico === 0 
+                    ? `-- <span class="text-xs text-slate-500 font-normal">(Sin Tempo)</span>` 
+                    : `${cancionActivaDatos.tempo} <span class="text-xs text-slate-500 font-normal">BPM</span>`;
+            }
+
+            // Manejo de estados de reproducción en el botón principal
+            if (indiceSetlistSonando !== null) {
+                const cActual = repertorioActual.canciones[idxActivoEfectivo] ? cancionesGeneral.find(o => o.id === repertorioActual.canciones[idxActivoEfectivo].id) : null;
+                const esMudo = cActual ? (obtenerBpmNumerico(cActual.tempo) === 0) : true;
+
+                btnPlayerToggle.innerHTML = esMudo ? '⏸' : '■';
+                btnPlayerToggle.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+                btnPlayerToggle.classList.add(esMudo ? 'bg-amber-600' : 'bg-red-600', esMudo ? 'hover:bg-amber-500' : 'hover:bg-red-500');
+            } else {
+                btnPlayerToggle.innerHTML = '▶';
+                btnPlayerToggle.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-amber-600', 'hover:bg-amber-500');
+                btnPlayerToggle.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+            }
+
+            // Sincronizar botones pequeños de las listas
+            document.querySelectorAll('.btn-metro').forEach(btn => {
+                const idBtn = Number(btn.getAttribute('data-id'));
+                let coincideAislado = (indiceSetlistSonando === `asislado-${idBtn}`);
+                let coincideSetlist = (typeof indiceSetlistSonando === 'number' && repertorioActual.canciones[indiceSetlistSonando]?.id === idBtn);
+                
+                if (coincideAislado || coincideSetlist) {
+                    btn.innerHTML = '■';
+                    btn.classList.remove('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                    btn.classList.add('bg-red-600', 'text-white', 'border-red-600');
+                } else {
+                    btn.innerHTML = '▶';
+                    btn.classList.remove('bg-red-600', 'text-white', 'border-red-600');
+                    btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
+                }
+            });
+        }
+
+        function render() {
+            document.getElementById('nombre-rep-actual').textContent = repertorioActual.nombre;
+
+            const contSelector = document.getElementById('lista-selector-repertorio');
+            contSelector.innerHTML = '';
+            if (cancionesGeneral.length === 0) {
+                contSelector.innerHTML = '<p class="text-gray-400 text-center py-4 text-xs">No hay canciones disponibles. Añade algunas desde el Listado de Canciones.</p>';
+            } else {
+                cancionesGeneral.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-xs shadow-sm transition hover:border-gray-300";
+                    div.setAttribute('data-search-text', `${c.titulo.toLowerCase()} ${c.tonalidad.toLowerCase()}`);
+                    
+                    const bpmNumerico = obtenerBpmNumerico(c.tempo);
+                    const labelBPM = bpmNumerico === 0 ? '-- BPM' : `${c.tempo} BPM`;
+
+                    div.innerHTML = `
+                        <div class="truncate mr-2 flex-grow">
+                            <p class="font-bold text-gray-700 truncate">${c.titulo}</p>
+                            <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-gray-400">
+                                <span>Tono: <span class="font-bold text-indigo-500">${c.tonalidad}</span></span>
+                                <span>• ${c.duracion}</span>
+                                <span>• ${labelBPM}</span>
+                                <button onclick="conmutarMetronomoSuelto(${c.id}, '${c.tempo}')" data-id="${c.id}" class="btn-metro ml-1 px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 font-bold transition">▶</button>
+                            </div>
+                        </div>
+                        <button onclick="agregarAlRepertorio(${c.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-2.5 py-1 rounded shadow-sm text-sm transition flex-shrink-0">+</button>
+                    `;
+                    contSelector.appendChild(div);
+                });
+                filtrarCancionesSelector();
+            }
+
+            const contSetlist = document.getElementById('lista-setlist-final');
+            contSetlist.innerHTML = '';
+            if (repertorioActual.canciones.length === 0) {
+                contSetlist.innerHTML = '<p class="text-gray-400 text-center py-12 text-xs">El repertorio está vacío.<br>Busca temas a la izquierda y pulsa el botón (+) para encajarlos aquí.</p>';
+                btnImprimir.classList.add('hidden');
+            } else {
+                btnImprimir.classList.remove('hidden');
+                repertorioActual.canciones.forEach((item, index) => {
+                    const c = cancionesGeneral.find(cancion => cancion.id === item.id);
+                    if (!c) return;
+                    
+                    const esUltima = (index === repertorioActual.canciones.length - 1);
+                    const div = document.createElement('div');
+                    
+                    let clasesEnlace = "";
+                    if (item.enlazada && !esUltima) {
+                        clasesEnlace = "linea-enlace mb-5 border-l-4 border-indigo-600 rounded-l-none bg-indigo-50/80";
+                    } else {
+                        clasesEnlace = "bg-indigo-50/30 border-indigo-100";
+                    }
+
+                    div.className = `elemento-arrastrable flex justify-between items-center p-2.5 rounded-lg border text-xs shadow-sm transition ${clasesEnlace}`;
+                    
+                    div.setAttribute('draggable', 'true');
+                    div.setAttribute('ondragstart', `iniciarArrastre(event, ${index})`);
+                    div.setAttribute('ondragend', 'final完rastre(event)');
+                    div.setAttribute('ondragover', 'event.preventDefault()');
+                    div.setAttribute('ondragenter', 'alEntrarElemento(event)');
+                    div.setAttribute('ondragleave', 'alSalirElemento(event)');
+                    div.setAttribute('ondrop', `soltarSobreElemento(event, ${index})`);
+                    
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-1.5 min-w-0 pointer-events-none select-none">
+                            <span class="font-black text-indigo-400 w-5 text-right">${index + 1}.</span>
+                            <span class="font-bold text-gray-800 truncate text-sm">${c.titulo}</span>
+                        </div>
+                        <div class="flex items-center space-x-1 flex-shrink-0 z-20">
+                            <button onclick="conmutarMetronomoPorIndice(${index})" data-id="${c.id}" class="btn-metro text-[10px] font-bold px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 transition">▶</button>
+                            <span class="text-[10px] font-bold text-indigo-600 bg-white px-1.5 py-0.5 border rounded pointer-events-none select-none">${c.tonalidad}</span>
+                            
+                            ${!esUltima ? `
+                                <button onclick="conmutarEnlace(${index})" title="Enlazar con el siguiente" class="p-1 rounded transition ${item.enlazada ? 'bg-indigo-600 text-white' : 'hover:bg-gray-200 text-gray-400'}">
+                                    🔗
+                                </button>
+                            ` : ''}
+
+                            <button onclick="moverCancion(${index}, 'subir')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500">▲</button>
+                            <button onclick="moverCancion(${index}, 'bajar')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500">▼</button>
+                            <button onclick="quitarDelRepertorio(${index})" class="text-red-500 font-bold ml-1 p-1 hover:bg-red-50 rounded">✕</button>
+                        </div>
+                    `;
+                    contSetlist.appendChild(div);
+                });
+            }
+            tiempoTotalEl.textContent = calcularTiempoTotal();
+            renderPlaylistMetronomo(); 
+        }
+
+        // --- IMPRESIÓN ---
+        btnImprimir.addEventListener('click', () => {
+            detenerMetronomo();
+            const body = document.getElementById('tabla-impresion-body');
+            body.innerHTML = '';
+            document.getElementById('print-titulo-rep').textContent = `FRAGUEL ROCK - ${repertorioActual.nombre.toUpperCase()}`;
+            document.getElementById('print-info-total').textContent = `Temas Totales: ${repertorioActual.canciones.length}  |  Duración: ${calcularTiempoTotal()}`;
+
+            let enBloqueEnlazado = false;
+
+            repertorioActual.canciones.forEach((item, index) => {
+                const c = cancionesGeneral.find(cancion => cancion.id === item.id);
+                if (c) {
+                    const tr = document.createElement('tr');
+                    let estiloFila = ""; let indicadorEnlace = "";
+                    
+                    if (item.enlazada && (index < repertorioActual.canciones.length - 1)) {
+                        estiloFila = "enlazado-print"; indicadorEnlace = " ➔ (ENGANCHADA)"; enBloqueEnlazado = true;
+                    } else if (enBloqueEnlazado) {
+                        estiloFila = "enlazado-print enlazado-print-fin"; enBloqueEnlazado = false;
+                    }
+
+                    if (estiloFila) tr.className = estiloFila;
+
+                    const bpmTexto = obtenerBpmNumerico(c.tempo) === 0 ? '--' : `${c.tempo} BPM`;
+
+                    tr.innerHTML = `
+                        <td style="text-align: center; font-weight: bold; font-size: 11pt;">${index + 1}</td>
+                        <td style="font-weight: 700; font-size: 15pt; letter-spacing: -0.3px;">
+                            ${c.titulo} <span style="font-size: 10.5pt; color: #4f46e5; font-weight: 900; letter-spacing: 0px;">${indicadorEnlace}</span>
+                        </td>
+                        <td style="text-align: center; font-weight: 900; font-size: 12pt; color: #1e1b4b; background-color: #e4e4e7;">${c.tonalidad}</td>
+                        <td style="text-align: center; font-size: 10pt; color: #4b5563;">${bpmTexto}</td>
+                    `;
+                    body.appendChild(tr);
+                }
+            });
+            window.print();
+            render();
+        });
+
+        render();
+    </script>
+</body>
+</html>
