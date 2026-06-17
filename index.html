@@ -8,7 +8,7 @@
     <style>
         @media print {
             body { background: white; color: black; font-size: 11pt; }
-            #app-container, button, form, nav, .no-print, [id^="modal-"], .filtro-contenedor { display: none !important; }
+            #app-container, button, form, nav, .no-print, [id^=\"modal-\"], .filtro-contenedor { display: none !important; }
             #seccion-impresion { display: block !important; width: 100%; height: 100%; }
             @page { size: A4 portrait; margin: 15mm; }
             table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -20,7 +20,7 @@
         #seccion-impresion { display: none; }
         .linea-enlace { position: relative; }
         .linea-enlace::after {
-            content: "🔗 Enlazada con la siguiente";
+            content: "🔗 Enlazada";
             position: absolute;
             bottom: -14px;
             left: 32px;
@@ -37,36 +37,24 @@
         .elemento-arrastrable.arrastrando { opacity: 0.4; background-color: #e0e7ff !important; border: 2px dashed #4f46e5 !important; }
         .elemento-arrastrable.sobre-vuelo { border-top: 4px solid #4f46e5 !important; transition: border 0.15s ease-in-out; }
         
-        /* Animación suave para los pulsos del metrónomo */
         .bola-pulso { transition: background-color 0.05s ease-out, transform 0.05s ease-out; }
-        
-        /* Ajustes dinámicos para el modo pantalla completa nativo o forzado por CSS */
-        .metro-fullscreen {
-            position: fixed !important;
-            inset: 0 !important;
-            z-index: 1000 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            max-height: 100vh !important;
-            border-radius: 0px !important;
-        }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col">
 
-    <div id="app-container" class="container mx-auto px-4 py-6 max-w-full flex-grow">
+    <div id="app-container" class="container mx-auto px-4 py-6 max-w-5xl flex-grow flex flex-col">
         
         <header class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4 bg-gradient-to-r from-indigo-900 to-indigo-700 p-6 rounded-xl text-white shadow-md">
             <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                <img src="WhatsApp Image 2026-06-16 at 16.20.44.jpeg" alt="Fraguel Rock Logo" class="w-20 h-20 object-contain rounded-full bg-white p-1 shadow-inner">
+                <img src="WhatsApp Image 2026-06-16 at 16.20.44.jpeg" alt="Fraguel Rock Logo" class="w-16 h-16 object-contain rounded-full bg-white p-1 shadow-inner">
                 <div>
-                    <h1 class="text-3xl font-black tracking-tight text-yellow-400">Fraguel Rock</h1>
-                    <p class="text-indigo-200 text-xs font-medium mt-1">Listado Temas y Repertorio de la mejor banda que jamás tus ojos vieron</p>
+                    <h1 class="text-2xl font-black tracking-tight text-yellow-400">Fraguel Rock</h1>
+                    <p class="text-indigo-200 text-xs font-medium">Listado Temas y Repertorio de directo</p>
                 </div>
             </div>
             
             <div class="flex flex-wrap gap-2 w-full md:w-auto justify-center">
-                <button onclick="abrirModalBaseGeneral()" class="bg-indigo-600 border border-indigo-400 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-500 transition text-xs">
+                <button onclick="abrirModalBaseGeneral(false)" class="bg-indigo-600 border border-indigo-400 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-500 transition text-xs">
                     🎵 Listado Canciones (Base)
                 </button>
                 <button onclick="abrirModalRepertorios()" class="bg-indigo-950 border border-indigo-800 text-indigo-200 px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-900 transition text-xs">
@@ -75,92 +63,46 @@
             </div>
         </header>
 
-        <div class="bg-indigo-50/50 p-3 rounded-lg mb-4 text-center border border-indigo-100/80">
-            <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider">Repertorio en elaboration:</span>
-            <span id="nombre-rep-actual" class="text-sm font-black text-indigo-600 ml-1">Nuevo Repertorio</span>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 flex flex-col h-[600px]">
-                <div class="border-b pb-3 mb-3">
-                    <h3 class="font-black text-gray-700 uppercase tracking-wider text-xs mb-2">1. Añadir al repertorio</h3>
-                    <div class="relative filtro-contenedor">
-                        <input type="text" id="buscador-canciones" oninput="filtrarCancionesSelector()" placeholder="🔍 Buscar canción por título o tono..." class="w-full p-2 pl-8 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
+        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col flex-grow justify-between min-h-[500px]">
+            <div class="flex flex-col">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b pb-4 mb-4">
+                    <div>
+                        <span class="text-[10px] font-black text-indigo-600 uppercase tracking-wider block">Setlist Activo</span>
+                        <h2 id="nombre-rep-actual" class="text-xl font-black text-gray-800">Nuevo Repertorio</h2>
                     </div>
-                </div>
-                <div id="lista-selector-repertorio" class="space-y-2 overflow-y-auto flex-grow pr-1"></div>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 flex flex-col h-[600px] justify-between">
-                <div class="flex flex-col h-[480px]">
-                    <div class="flex justify-between items-center mb-3 border-b pb-2">
-                        <h3 class="font-black text-gray-700 uppercase tracking-wider text-xs">2. Estructura del Setlist <span class="text-[10px] text-gray-400 font-normal block sm:inline sm:ml-2">(Arrastra para ordenar)</span></h3>
+                    <div class="flex items-center gap-4 justify-between sm:justify-end">
+                        <button onclick="abrirModalBaseGeneral(true)" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition text-xs uppercase tracking-wider shadow flex items-center gap-1">
+                            <span>➕</span> Añadir Canción
+                        </button>
                         <div class="text-right">
-                            <span class="text-[10px] uppercase text-gray-400 font-bold block">Duración Total</span>
-                            <div id="tiempo-total" class="text-lg font-black text-emerald-600">00:00:00</div>
+                            <span class="text-[10px] uppercase text-gray-400 font-bold block">Duración Estimada</span>
+                            <div id="tiempo-total" class="text-xl font-black text-emerald-600">00:00:00</div>
                         </div>
                     </div>
-                    <div id="lista-setlist-final" class="space-y-3 overflow-y-auto flex-grow pr-1 pb-4"></div>
                 </div>
 
-                <div class="space-y-2 pt-2 border-t">
-                    <button onclick="guardarRepertorioActual()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold hover:bg-indigo-700 transition text-xs uppercase tracking-wider shadow-sm">
-                        💾 Guardar / Actualizar Repertorio
-                    </button>
-                    <button id="btn-imprimir" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition uppercase tracking-wider text-sm hidden shadow-md">
-                        🖨️ Imprimir en un Folio (A4)
-                    </button>
-                </div>
+                <div id="lista-setlist-final" class="space-y-3 pb-6"></div>
             </div>
 
-            <div id="contenedor-columna-metro" class="bg-slate-900 p-5 rounded-xl shadow-md border border-slate-800 flex flex-col h-[600px] text-white transition-all duration-300">
-                <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
-                    <div>
-                        <h3 class="font-black text-yellow-400 uppercase tracking-wider text-xs">3. Modo Metrónomo</h3>
-                        <p class="text-slate-400 text-[10px] mt-0.5">Control e indicadores visuales de tiempo para directo.</p>
-                    </div>
-                    <button onclick="conmutarPantallaCompleta()" title="Alternar pantalla completa" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg border border-slate-700 font-bold text-xs transition">
-                        🔲 Pantalla Completa
-                    </button>
-                </div>
-                
-                <div id="playlist-metronomo" class="space-y-2 overflow-y-auto flex-grow pr-1 mb-4"></div>
-
-                <div class="flex justify-center items-center gap-6 py-4 bg-slate-950/40 rounded-xl border border-slate-800/60 mb-3 shadow-inner">
-                    <div id="bola-1" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
-                    <div id="bola-2" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
-                    <div id="bola-3" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
-                    <div id="bola-4" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
-                </div>
-
-                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 shadow-inner">
-                    <div class="text-center mb-3">
-                        <p id="metro-player-titulo" class="text-xs font-bold text-slate-400 truncate">Ningún tema seleccionado</p>
-                        <p id="metro-player-bpm" class="text-2xl font-black text-yellow-400 mt-0.5">-- <span class="text-xs text-slate-500 font-normal">BPM</span></p>
-                    </div>
-                    <div class="flex justify-center items-center gap-4">
-                        <button onclick="retrocederTemaMetro()" title="Canción anterior" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 flex items-center justify-center font-bold text-lg transition text-slate-200">
-                            ⏮
-                        </button>
-                        <button id="btn-metro-player-toggle" onclick="conmutarPlayPlayerMetro()" title="Iniciar / Detener" class="w-16 h-16 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 flex items-center justify-center font-black text-2xl transition shadow-lg text-white">
-                            ▶
-                        </button>
-                        <button onclick="avanzarTemaMetro()" title="Siguiente canción" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 flex items-center justify-center font-bold text-lg transition text-slate-200">
-                            ⏭
-                        </button>
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t mt-auto">
+                <button onclick="guardarRepertorioActual()" class="bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition text-xs uppercase tracking-wider shadow-sm">
+                    💾 Guardar Repertorio
+                </button>
+                <button id="btn-abrir-metronomo" onclick="abrirModalMetronomoFullscreen()" class="bg-slate-900 text-yellow-400 py-3 rounded-lg font-bold hover:bg-slate-800 transition text-xs uppercase tracking-wider shadow-sm border border-slate-700 flex items-center justify-center gap-2">
+                    ⏱️ Metrónomo del Repertorio
+                </button>
+                <button id="btn-imprimir" class="bg-gray-100 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-200 transition uppercase tracking-wider text-xs shadow-sm hidden">
+                    🖨️ Imprimir Listado (A4)
+                </button>
             </div>
-
         </div>
     </div>
 
     <div id="modal-base-general" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-40">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl h-[85vh] flex flex-col justify-between">
-            <div>
+            <div class="flex flex-col flex-shrink-0">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
-                    <h3 class="text-xl font-black text-gray-800">🎵 Base de Datos General</h3>
+                    <h3 id="titulo-modal-base" class="text-xl font-black text-gray-800">🎵 Base de Datos General</h3>
                     <div class="flex gap-4 text-xs items-center">
                         <button onclick="exportarDatos()" class="text-gray-500 hover:text-indigo-600 font-bold">📥 Copia para NAS</button>
                         <label class="text-gray-500 hover:text-indigo-600 font-bold cursor-pointer">
@@ -169,15 +111,24 @@
                         <button onclick="cerrarModalBaseGeneral()" class="text-gray-400 hover:text-gray-600 text-xl font-black ml-2">✕</button>
                     </div>
                 </div>
-                <div class="flex justify-between items-center mb-3">
-                    <p class="text-xs text-gray-500">Añade o modifica las canciones que Fraguel Rock tiene ensayadas.</p>
-                    <button onclick="abrirModalNueva()" class="bg-yellow-400 text-indigo-950 px-3 py-1.5 rounded-lg font-bold shadow hover:bg-yellow-300 transition text-xs">
-                        ➕ Nueva Canción
+                <div class="flex flex-col sm:flex-row gap-3 justify-between items-center mb-4">
+                    <div class="relative w-full sm:w-72">
+                        <input type="text" id="buscador-canciones" oninput="filtrarCancionesSelector()" placeholder="🔍 Buscar por título o tono..." class="w-full p-2 pl-8 border rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
+                    </div>
+                    <button onclick="abrirModalNueva()" class="bg-yellow-400 text-indigo-950 px-3 py-2 rounded-lg font-bold shadow hover:bg-yellow-300 transition text-xs w-full sm:w-auto">
+                        ➕ Crear Nueva Canción en Base
                     </button>
                 </div>
             </div>
+            
             <div id="lista-general-completa" class="space-y-2 overflow-y-auto flex-grow my-2 pr-1"></div>
-            <div class="text-right border-t pt-3">
+            
+            <div class="flex justify-between items-center border-t pt-3 flex-shrink-0">
+                <div id="contenedor-accion-multiple">
+                    <button id="btn-insertar-multiples" onclick="insertarCancionesSeleccionadas()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-emerald-700 hidden shadow">
+                        ✅ Añadir canciones seleccionadas
+                    </button>
+                </div>
                 <button onclick="cerrarModalBaseGeneral()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-200">Cerrar Ventana</button>
             </div>
         </div>
@@ -199,7 +150,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase">BPM</label>
-                        <input type="text" id="tempo" placeholder="120 o -" required class="w-full mt-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <input type="text" id="tempo" placeholder="120" required class="w-full mt-1 p-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase">Duración</label>
@@ -229,6 +180,62 @@
         </div>
     </div>
 
+    <div id="modal-metronomo-fullscreen" class="fixed inset-0 bg-slate-950 hidden z-50 flex flex-col text-white select-none">
+        <div class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center flex-shrink-0">
+            <span id="metro-full-tono" class="bg-indigo-600 text-white font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-wider">Tono: --</span>
+            <button onclick="cerrarModalMetronomoFullscreen()" class="bg-slate-800 hover:bg-slate-700 text-gray-300 px-4 py-1.5 rounded-lg text-xs font-bold transition">
+                ✕ Salir del Modo
+            </button>
+        </div>
+
+        <div class="flex-shrink-0 flex flex-col justify-center items-center px-4 py-4 text-center max-w-2xl mx-auto w-full border-b border-slate-900 bg-slate-950">
+            <div class="w-full mb-1">
+                <h2 id="metro-full-titulo" class="text-2xl sm:text-3xl font-black text-white tracking-tight line-clamp-1 uppercase text-ellipsis overflow-hidden">Ningún tema</h2>
+            </div>
+
+            <div class="w-full flex flex-col items-center justify-center py-2">
+                <div class="flex items-center justify-center gap-5 mb-4">
+                    <div id="full-bola-1" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                    <div id="full-bola-2" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                    <div id="full-bola-3" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                    <div id="full-bola-4" class="bola-pulso w-7 h-7 rounded-full bg-slate-800 border-2 border-slate-700 shadow-md"></div>
+                </div>
+
+                <div class="flex items-center justify-center gap-8 w-full">
+                    <button onclick="modificarTempoBpm(-1)" class="text-4xl sm:text-5xl font-black text-slate-400 hover:text-white transition px-4 py-2 active:scale-95 select-none">
+                        &minus;
+                    </button>
+                    
+                    <div class="text-center min-w-[140px]">
+                        <div id="metro-full-bpm" class="text-7xl sm:text-8xl font-black text-yellow-400 tracking-tight leading-none select-all">--</div>
+                        <div class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">BPM REGULABLE</div>
+                    </div>
+
+                    <button onclick="modificarTempoBpm(1)" class="text-4xl sm:text-5xl font-black text-slate-400 hover:text-white transition px-4 py-2 active:scale-95 select-none">
+                        +
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-center items-center gap-14 my-2">
+                <button onclick="retrocederTemaMetro()" class="text-slate-200 hover:text-white active:scale-90 font-bold text-4xl transition select-none bg-transparent border-0 outline-none p-2">
+                    ⏮
+                </button>
+                <button id="btn-metro-full-toggle" onclick="conmutarPlayPlayerMetro()" class="text-white hover:text-yellow-400 active:scale-90 font-black text-5xl transition select-none bg-transparent border-0 outline-none p-2">
+                    ▶
+                </button>
+                <button onclick="avanzarTemaMetro()" class="text-slate-200 hover:text-white active:scale-90 font-bold text-4xl transition select-none bg-transparent border-0 outline-none p-2">
+                    ⏭
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-grow bg-slate-900/60 p-4 overflow-y-auto flex flex-col">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex-shrink-0">Lista de reproducción del Setlist activo</p>
+            <div id="playlist-metronomo-full" class="space-y-2 flex-grow"></div>
+        </div>
+    </div>
+
     <div id="seccion-impresion">
         <h1 id="print-titulo-rep" style="font-size: 24pt; font-weight: 800; margin-bottom: 2px; text-align: center; letter-spacing: -1px;">FRAGUEL ROCK</h1>
         <p id="print-info-total" style="text-align: center; font-weight: bold; margin-bottom: 20px; color: #333; font-size: 11pt; border-bottom: 2px solid #000; padding-bottom: 5px;"></p>
@@ -248,12 +255,10 @@
     <script>
         // =========================================================================
         // 💡 COPIA DE RESPALDO AUTOMÁTICA (PARA COMPARTIR CON LA BANDA)
-        // Pega el contenido de tu 'fraguel_rock_backup.json' entre las llaves {} de abajo.
-        // Ejemplo: const COPIA_RESPALDO_AUTOMATICA = {"canciones":[...], "repertorios":[...]};
         // =========================================================================
         const COPIA_RESPALDO_AUTOMATICA = {"canciones":[{"id":1781619265613,"titulo":"VOY A PASARMELO BIEN","tonalidad":"E","tempo":"148","duracion":"03:45"},{"id":1781619284549,"titulo":"MAR ADENTRO","tonalidad":"Cm","tempo":"140","duracion":"04:10"},{"id":1781619309589,"titulo":"ANTES DE QUE CUENTE 10","tonalidad":"F#m","tempo":"150","duracion":"04:40"},{"id":1781619330374,"titulo":"VIVIENDO DEPRISA","tonalidad":"D","tempo":"156","duracion":"03:15"},{"id":1781619374680,"titulo":"SUFRE MAMÓN","tonalidad":"Cm","tempo":"172","duracion":"03:10"},{"id":1781619570431,"titulo":"RADIO GAGA","tonalidad":"E","tempo":"0","duracion":"02:30"},{"id":1781619607175,"titulo":"TAKE ON ME","tonalidad":"D","tempo":"168","duracion":"04:15"},{"id":1781619758461,"titulo":"TU ENEMIGO","tonalidad":"Gm","tempo":"90","duracion":"04:00"},{"id":1781619976876,"titulo":"VENECIA","tonalidad":"C","tempo":"172","duracion":"05:25"},{"id":1781619990636,"titulo":"LA CASA POR EL TEJADO","tonalidad":"F","tempo":"150","duracion":"04:45"},{"id":1781620005700,"titulo":"BAILA MORENA","tonalidad":"Gm","tempo":"122","duracion":"04:25"},{"id":1781620027821,"titulo":"MIX DANCE","tonalidad":"Gm","tempo":"130","duracion":"05:00"},{"id":1781620049845,"titulo":"ENTRE DOS TIERRAS","tonalidad":"Bm","tempo":"166","duracion":"06:10"},{"id":1781620080070,"titulo":"INSURRECCIÓN","tonalidad":"G - A","tempo":"128","duracion":"03:45"},{"id":1781620095255,"titulo":"EMBORRACHARME","tonalidad":"G","tempo":"156","duracion":"03:30"},{"id":1781620115256,"titulo":"UNA FOTO EN B/N","tonalidad":"D","tempo":"139","duracion":"03:30"},{"id":1781620137193,"titulo":"EL FIN DEL MUNDO","tonalidad":"F","tempo":"0","duracion":"03:10"},{"id":1781620217371,"titulo":"CUANDO EL MAR TE TENGA","tonalidad":"F","tempo":"138","duracion":"03:40"},{"id":1781620231092,"titulo":"INSOPORTABLE","tonalidad":"E","tempo":"131","duracion":"04:00"},{"id":1781620249429,"titulo":"MIX ESTOPA","tonalidad":"Am","tempo":"152","duracion":"04:00"},{"id":1781620321462,"titulo":"BUSCANDO EL SOL","tonalidad":"G","tempo":"162","duracion":"04:10"},{"id":1781620334055,"titulo":"NI TU NI NADIE","tonalidad":"A","tempo":"138","duracion":"03:50"},{"id":1781620365968,"titulo":"LA FUERZA DEL DESTINO","tonalidad":"A","tempo":"109","duracion":"03:10"},{"id":1781620382128,"titulo":"VIDEO KILLED RADIO STAR","tonalidad":"C","tempo":"132","duracion":"02:15"},{"id":1781620399562,"titulo":"I WANT TO BREAK FREE","tonalidad":"D","tempo":"107","duracion":"04:15"},{"id":1781620438658,"titulo":"ANTES VER EL SOL","tonalidad":"A","tempo":"138","duracion":"04:00"},{"id":1781620451922,"titulo":"20 DE ABRIL","tonalidad":"Dm ","tempo":"224","duracion":"03:55"},{"id":1781620466826,"titulo":"PACTO ENTRE CABALLEROS","tonalidad":"D","tempo":"208","duracion":"04:15"},{"id":1781620499764,"titulo":"PRINCESAS (+EXTRAS)","tonalidad":"G","tempo":"132","duracion":"05:00"},{"id":1781620523229,"titulo":"NEVER GONNA GIVE YOU UP","tonalidad":"Am","tempo":"117","duracion":"04:00"},{"id":1781620569702,"titulo":"MIX LEIVA","tonalidad":"C","tempo":"128","duracion":"07:20"}],"repertorios":[{"id":1781621651176,"nombre":"LONGROCK 17 JUNIO","canciones":[{"id":1781619265613,"enlazada":true},{"id":1781619284549,"enlazada":true},{"id":1781619309589,"enlazada":true},{"id":1781619374680,"enlazada":true},{"id":1781619570431,"enlazada":false},{"id":1781619607175,"enlazada":false},{"id":1781619758461,"enlazada":false},{"id":1781619990636,"enlazada":false},{"id":1781620005700,"enlazada":false},{"id":1781620027821,"enlazada":false},{"id":1781620049845,"enlazada":false},{"id":1781620080070,"enlazada":false},{"id":1781620115256,"enlazada":false},{"id":1781620231092,"enlazada":false},{"id":1781620217371,"enlazada":true},{"id":1781620137193,"enlazada":true},{"id":1781620249429,"enlazada":true},{"id":1781620321462,"enlazada":false},{"id":1781620334055,"enlazada":false},{"id":1781620466826,"enlazada":true},{"id":1781620438658,"enlazada":true},{"id":1781620499764,"enlazada":false},{"id":1781620523229,"enlazada":false}]}]};
 
-        // --- INICIALIZACIÓN DE DATOS (CON CARGA PREVIA) ---
+        // --- INICIALIZACIÓN DE DATOS ---
         if (!localStorage.getItem('FR_canciones') && !localStorage.getItem('FR_repertorios') && COPIA_RESPALDO_AUTOMATICA) {
             if (COPIA_RESPALDO_AUTOMATICA.canciones) localStorage.setItem('FR_canciones', JSON.stringify(COPIA_RESPALDO_AUTOMATICA.canciones));
             if (COPIA_RESPALDO_AUTOMATICA.repertorios) localStorage.setItem('FR_repertorios', JSON.stringify(COPIA_RESPALDO_AUTOMATICA.repertorios));
@@ -262,20 +267,19 @@
         let cancionesGeneral = JSON.parse(localStorage.getItem('FR_canciones')) || [];
         let repertoriosGuardados = JSON.parse(localStorage.getItem('FR_repertorios')) || [];
         
-        let repertorioActual = {
-            id: null,
-            nombre: "Nuevo Repertorio",
-            canciones: [], 
-        };
+        let repertorioActual = { id: null, nombre: "Nuevo Repertorio", canciones: [] };
 
-        // --- SISTEMA DE METRÓNOMO AUDIO Y VISUAL ---
+        // --- MODO MODAL SELECTOR ---
+        let modoAgregarAlRepertorioDirecto = false;
+
+        // --- AUDIO Y CONTROL DE METRÓNOMO ---
         let audioCtx = null;
         let metronomoIntervalo = null;
         let tiempoActualMetronomo = 0;
         let indiceSetlistSonando = null; 
-        let wakeLock = null; // Control de bloqueo de pantalla apagada
+        let wakeLock = null;
+        let bpmModificadoEnDirecto = null; // Guarda alteraciones manuales momentáneas de tempo en el directo
 
-        // Función auxiliar para parsear tempos nulos safely
         function obtenerBpmNumerico(valor) {
             if (!valor || valor === '-' || valor === '0' || valor === 0) return 0;
             const num = Number(valor);
@@ -283,174 +287,125 @@
         }
 
         async function activarBloqueoPantalla() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch (err) {
-                console.log("Wake Lock no soportado o denegado.");
-            }
+            try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
         }
 
         function desactivarBloqueoPantalla() {
-            if (wakeLock !== null) {
-                wakeLock.release();
-                wakeLock = null;
-            }
+            if (wakeLock !== null) { wakeLock.release(); wakeLock = null; }
         }
 
         function refrescarBolasVisuales(pulsoActivo, esSilencioso = false) {
-            // Reseteamos todas las bolas a su estado apagado base
             for (let i = 1; i <= 4; i++) {
-                const bola = document.getElementById(`bola-${i}`);
+                const bola = document.getElementById(`full-bola-${i}`);
                 if (bola) {
-                    bola.classList.remove('bg-yellow-400', 'border-yellow-300', 'scale-110', 'bg-orange-500', 'border-orange-400');
+                    bola.classList.remove('bg-yellow-400', 'border-yellow-300', 'scale-125', 'bg-orange-500', 'border-orange-400');
                     bola.classList.add('bg-slate-800', 'border-slate-700');
                 }
             }
-
             if (esSilencioso || pulsoActivo === null) return;
 
-            // Calculamos cuál bola encender en base a un compás de 4 pulsos (1 a 4)
             const bolaAEncender = (pulsoActivo % 4) + 1;
-            const targetBola = document.getElementById(`bola-${bolaAEncender}`);
-            
+            const targetBola = document.getElementById(`full-bola-${bolaAEncender}`);
             if (targetBola) {
                 targetBola.classList.remove('bg-slate-800', 'border-slate-700');
                 if (bolaAEncender === 1) {
-                    // Primer tiempo fuerte: Amarillo destellante
-                    targetBola.classList.add('bg-yellow-400', 'border-yellow-300', 'scale-110');
+                    targetBola.classList.add('bg-yellow-400', 'border-yellow-300', 'scale-125');
                 } else {
-                    // Tiempos débiles: Naranja brillante (Como la captura solicitada)
                     targetBola.classList.add('bg-orange-500', 'border-orange-400');
                 }
             }
         }
 
-        function conmutarMetronomoPorIndice(index) {
+        function conmutarMetronomoPorIndice(index, mantenerBpmAlterado = false) {
             if (index === null || index < 0 || index >= repertorioActual.canciones.length) {
-                detenerMetronomo();
-                renderPlaylistMetronomo();
-                return;
+                detenerMetronomo(); renderPlaylistMetronomoFull(); return;
+            }
+            if (!mantenerBpmAlterado && indiceSetlistSonando === index) {
+                detenerMetronomo(); renderPlaylistMetronomoFull(); return;
             }
 
-            if (indiceSetlistSonando === index) {
-                detenerMetronomo();
-                renderPlaylistMetronomo();
-                return;
+            if (metronomoIntervalo) {
+                clearInterval(metronomoIntervalo);
+                metronomoIntervalo = null;
             }
-
-            if (metronomoIntervalo) detenerMetronomo();
 
             const itemSetlist = repertorioActual.canciones[index];
             const cancionDatos = cancionesGeneral.find(c => c.id === itemSetlist.id);
             if (!cancionDatos) return;
 
             indiceSetlistSonando = index;
-            tiempoActualMetronomo = 0;
             
-            const bpm = obtenerBpmNumerico(cancionDatos.tempo);
+            // Si no mantenemos un cambio manual, cargamos el tempo original de la base
+            if (!mantenerBpmAlterado) {
+                tiempoActualMetronomo = 0;
+                bpmModificadoEnDirecto = obtenerBpmNumerico(cancionDatos.tempo);
+            }
 
-            // MODO MUDO / SILENCIOSO si el tempo es 0 o '-'
+            const bpm = bpmModificadoEnDirecto;
+
             if (bpm === 0) {
                 activarBloqueoPantalla();
                 refrescarBolasVisuales(null, true); 
-                renderPlaylistMetronomo();
+                renderPlaylistMetronomoFull();
                 return; 
             }
 
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             activarBloqueoPantalla();
             const intervaloMs = (60 / bpm) * 1000;
 
             function reproducirGolpe() {
                 if (!audioCtx) return;
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-
-                // Actualizar la interfaz visual de las 4 bolas
                 refrescarBolasVisuales(tiempoActualMetronomo);
 
                 const osc = audioCtx.createOscillator();
                 const gainNode = audioCtx.createGain();
-                
-                osc.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
+                osc.connect(gainNode); gainNode.connect(audioCtx.destination);
 
-                if (tiempoActualMetronomo % 4 === 0) {
-                    osc.frequency.setValueAtTime(1000, audioCtx.currentTime); // Acento
-                } else {
-                    osc.frequency.setValueAtTime(750, audioCtx.currentTime);  // Normal
-                }
-
+                osc.frequency.setValueAtTime(tiempoActualMetronomo % 4 === 0 ? 1000 : 750, audioCtx.currentTime);
                 gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
 
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 0.09);
-
+                osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.09);
                 tiempoActualMetronomo++;
             }
 
             reproducirGolpe();
             metronomoIntervalo = setInterval(reproducirGolpe, intervaloMs);
-            renderPlaylistMetronomo();
-        }
-
-        function conmutarMetronomoSuelto(idCancion, valorTempo) {
-            const idxEnSetlist = repertorioActual.canciones.findIndex(item => item.id === idCancion);
-            if (idxEnSetlist !== -1) {
-                conmutarMetronomoPorIndice(idxEnSetlist);
-            } else {
-                if (indiceSetlistSonando === `asislado-${idCancion}`) {
-                    detenerMetronomo();
-                    renderPlaylistMetronomo();
-                    return;
-                }
-                if (metronomoIntervalo) detenerMetronomo();
-                
-                const bpm = obtenerBpmNumerico(valorTempo);
-                indiceSetlistSonando = `asislado-${idCancion}`;
-                tiempoActualMetronomo = 0;
-
-                if (bpm === 0) {
-                    refrescarBolasVisuales(null, true);
-                    renderPlaylistMetronomo();
-                    return;
-                }
-                
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                activarBloqueoPantalla();
-                
-                const intervaloMs = (60 / bpm) * 1000;
-                function reproducirGolpeAislado() {
-                    if (!audioCtx) return;
-                    refrescarBolasVisuales(tiempoActualMetronomo);
-                    const osc = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
-                    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-                    osc.frequency.setValueAtTime(tiempoActualMetronomo % 4 === 0 ? 1000 : 750, audioCtx.currentTime);
-                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-                    osc.start(audioCtx.currentTime); osc.stop(audioCtx.currentTime + 0.09);
-                    tiempoActualMetronomo++;
-                }
-                reproducirGolpeAislado();
-                metronomoIntervalo = setInterval(reproducirGolpeAislado, intervaloMs);
-                renderPlaylistMetronomo();
-            }
+            renderPlaylistMetronomoFull();
         }
 
         function detenerMetronomo() {
-            if (metronomoIntervalo) {
-                clearInterval(metronomoIntervalo);
-                metronomoIntervalo = null;
-            }
+            if (metronomoIntervalo) { clearInterval(metronomoIntervalo); metronomoIntervalo = null; }
             indiceSetlistSonando = null;
+            bpmModificadoEnDirecto = null;
             desactivarBloqueoPantalla();
             refrescarBolasVisuales(null, true);
+        }
+
+        // d) Función para alterar el tempo dinámicamente con los botones + y -
+        function modificarTempoBpm(delta) {
+            let idxActivo = typeof indiceSetlistSonando === 'number' ? indiceSetlistSonando : 0;
+            if (repertorioActual.canciones.length === 0) return;
+
+            if (bpmModificadoEnDirecto === null) {
+                const itemSetlist = repertorioActual.canciones[idxActivo];
+                const c = cancionesGeneral.find(canc => canc.id === itemSetlist.id);
+                bpmModificadoEnDirecto = c ? obtenerBpmNumerico(c.tempo) : 120;
+            }
+
+            // Aplicamos cambio
+            bpmModificadoEnDirecto += delta;
+            if (bpmModificadoEnDirecto < 30) bpmModificadoEnDirecto = 30;
+            if (bpmModificadoEnDirecto > 300) bpmModificadoEnDirecto = 300;
+
+            // Si está sonando el metrónomo, reiniciamos el intervalo al vuelo con el nuevo tempo
+            if (metronomoIntervalo && typeof indiceSetlistSonando === 'number') {
+                conmutarMetronomoPorIndice(indiceSetlistSonando, true);
+            } else {
+                renderPlaylistMetronomoFull();
+            }
         }
 
         function retrocederTemaMetro() {
@@ -460,7 +415,6 @@
                 nuevoIdx = indiceSetlistSonando - 1;
                 if (nuevoIdx < 0) nuevoIdx = repertorioActual.canciones.length - 1;
             }
-            indiceSetlistSonando = null;
             conmutarMetronomoPorIndice(nuevoIdx);
         }
 
@@ -471,7 +425,6 @@
                 nuevoIdx = indiceSetlistSonando + 1;
                 if (nuevoIdx >= repertorioActual.canciones.length) nuevoIdx = 0;
             }
-            indiceSetlistSonando = null;
             conmutarMetronomoPorIndice(nuevoIdx);
         }
 
@@ -484,30 +437,74 @@
             }
         }
 
-        // --- CONTROL PANTALLA COMPLETA ---
-        function conmutarPantallaCompleta() {
-            const columnaMetro = document.getElementById('contenedor-columna-metro');
-            if (!document.fullscreenElement) {
-                columnaMetro.classList.add('metro-fullscreen');
-                // Intentamos maximizar por API nativa si el navegador lo permite
-                if (columnaMetro.requestFullscreen) {
-                    columnaMetro.requestFullscreen().catch(() => {});
-                }
+        // --- MANEJO DE MODAL METRÓNOMO FULLSCREEN ---
+        function abrirModalMetronomoFullscreen() {
+            if (repertorioActual.canciones.length === 0) {
+                alert("Añade canciones a tu repertorio antes de abrir el metrónomo.");
+                return;
+            }
+            document.getElementById('modal-metronomo-fullscreen').classList.remove('hidden');
+            if (typeof indiceSetlistSonando !== 'number') {
+                conmutarMetronomoPorIndice(0);
             } else {
-                document.exitFullscreen().catch(() => {});
+                renderPlaylistMetronomoFull();
             }
         }
 
-        // Listener para limpiar clases CSS si se sale usando la tecla Escape nativa
-        document.addEventListener('fullscreenchange', () => {
-            const columnaMetro = document.getElementById('contenedor-columna-metro');
-            if (!document.fullscreenElement) {
-                columnaMetro.classList.remove('metro-fullscreen');
+        function cerrarModalMetronomoFullscreen() {
+            detenerMetronomo();
+            document.getElementById('modal-metronomo-fullscreen').classList.add('hidden');
+        }
+
+        function renderPlaylistMetronomoFull() {
+            const playlistCont = document.getElementById('playlist-metronomo-full');
+            const pTitulo = document.getElementById('metro-full-titulo');
+            const pBpm = document.getElementById('metro-full-bpm');
+            const pTono = document.getElementById('metro-full-tono');
+            const btnToggle = document.getElementById('btn-metro-full-toggle');
+
+            playlistCont.innerHTML = '';
+            let idxActivo = typeof indiceSetlistSonando === 'number' ? indiceSetlistSonando : 0;
+            let cancionActiva = null;
+
+            repertorioActual.canciones.forEach((item, index) => {
+                const c = cancionesGeneral.find(cancion => cancion.id === item.id);
+                if (!c) return;
+
+                const esElSonando = (indiceSetlistSonando === index);
+                if (index === idxActivo) cancionActiva = c;
+
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center p-3 rounded-xl text-xs cursor-pointer transition ${esElSonando ? 'bg-indigo-900 border border-indigo-500 font-bold text-yellow-400 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}`;
+                div.onclick = () => conmutarMetronomoPorIndice(index);
+                
+                div.innerHTML = `
+                    <span class="truncate text-sm font-semibold">${index + 1}. ${c.titulo}</span>
+                    <span class="text-[11px] bg-slate-950 px-2 py-0.5 rounded-md text-slate-400 font-black">${c.tempo === '0' || c.tempo === '-' ? '--' : c.tempo} BPM</span>
+                `;
+                playlistCont.appendChild(div);
+            });
+
+            if (cancionActiva) {
+                pTitulo.textContent = cancionActiva.titulo;
+                pTono.textContent = `Tono: ${cancionActiva.tonalidad}`;
+                
+                if (bpmModificadoEnDirecto !== null) {
+                    pBpm.textContent = bpmModificadoEnDirecto;
+                } else {
+                    const bpmNum = obtenerBpmNumerico(cancionActiva.tempo);
+                    pBpm.textContent = bpmNum === 0 ? '--' : cancionActiva.tempo;
+                }
             }
-        });
 
+            if (indiceSetlistSonando !== null) {
+                btnToggle.innerHTML = '■';
+            } else {
+                btnToggle.innerHTML = '▶';
+            }
+        }
 
-        // --- MANEJO DE INTERFAZ Y MODALES ---
+        // --- MANEJO DE INTERFAZ GENERAL Y MODALES ---
         const modalBaseGeneral = document.getElementById('modal-base-general');
         const modalCancion = document.getElementById('modal-cancion');
         const modalRepertorios = document.getElementById('modal-repertorios');
@@ -517,7 +514,23 @@
 
         let indiceArrastrado = null;
 
-        function abrirModalBaseGeneral() { modalBaseGeneral.classList.remove('hidden'); renderBaseGeneralList(); }
+        function abrirModalBaseGeneral(comoSelector = false) {
+            modoAgregarAlRepertorioDirecto = comoSelector;
+            const titulo = document.getElementById('titulo-modal-base');
+            const btnMultiples = document.getElementById('btn-insertar-multiples');
+            
+            if (modoAgregarAlRepertorioDirecto) {
+                titulo.textContent = "➕ Seleccionar Canciones para el Repertorio";
+                btnMultiples.classList.remove('hidden');
+            } else {
+                titulo.textContent = "🎵 Base de Datos General";
+                btnMultiples.classList.add('hidden');
+            }
+            
+            modalBaseGeneral.classList.remove('hidden');
+            renderBaseGeneralList();
+        }
+
         function cerrarModalBaseGeneral() { modalBaseGeneral.classList.add('hidden'); }
 
         function abrirModalNueva() {
@@ -547,7 +560,7 @@
             const datos = {
                 titulo: document.getElementById('titulo').value,
                 tonalidad: document.getElementById('tonalidad').value,
-                tempo: document.getElementById('tempo').value, // Guardado como String para admitir '-'
+                tempo: document.getElementById('tempo').value, 
                 duracion: document.getElementById('duracion').value
             };
 
@@ -564,12 +577,10 @@
         });
 
         function eliminarCancionGeneral(id) {
-            if(confirm("¿Quitar esta canción de la base de datos de Fraguel Rock? Se borrará de todos los repertorios.")) {
+            if(confirm("¿Quitar esta canción de la base de datos? Se eliminará también de tus repertorios.")) {
                 detenerMetronomo();
                 cancionesGeneral = cancionesGeneral.filter(c => c.id !== id);
-                repertoriosGuardados.forEach(rep => {
-                    rep.canciones = rep.canciones.filter(item => item.id !== id);
-                });
+                repertoriosGuardados.forEach(rep => rep.canciones = rep.canciones.filter(item => item.id !== id));
                 repertorioActual.canciones = repertorioActual.canciones.filter(item => item.id !== id);
                 localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
                 localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
@@ -580,7 +591,7 @@
 
         function filtrarCancionesSelector() {
             const busqueda = document.getElementById('buscador-canciones').value.toLowerCase();
-            const filas = document.querySelectorAll('#lista-selector-repertorio > div');
+            const filas = document.querySelectorAll('#lista-general-completa > div');
             filas.forEach(fila => {
                 const texto = fila.getAttribute('data-search-text');
                 if (texto.includes(busqueda)) fila.classList.remove('hidden');
@@ -591,9 +602,8 @@
         function abrirModalRepertorios() {
             const contenedor = document.getElementById('lista-repertorios-guardados');
             contenedor.innerHTML = '';
-
             if (repertoriosGuardados.length === 0) {
-                contenedor.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">No tienes ningún repertorio guardado aún.</p>';
+                contenedor.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">No tienes ningún repertorio guardado.</p>';
             } else {
                 repertoriosGuardados.forEach(rep => {
                     const div = document.createElement('div');
@@ -629,13 +639,11 @@
                 alert("Añade al menos una canción al repertorio antes de guardarlo.");
                 return;
             }
-
             let nuevoNombre = prompt("Nombre del repertorio:", repertorioActual.id ? repertorioActual.nombre : "");
             if (nuevoNombre === null) return;
             if (nuevoNombre.trim() === "") nuevoNombre = "Repertorio sin nombre";
 
             repertorioActual.nombre = nuevoNombre;
-
             if (repertorioActual.id) {
                 const idx = repertoriosGuardados.findIndex(r => r.id === repertorioActual.id);
                 if (idx !== -1) repertoriosGuardados[idx] = { ...repertorioActual };
@@ -644,20 +652,28 @@
                 repertoriosGuardados.push({ ...repertorioActual });
             }
 
+            localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
             localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
             render();
-            alert("¡Repertorio guardado correctamente!");
+
+            const backup = { canciones: cancionesGeneral, repertorios: repertoriosGuardados };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "fraguel_rock_backup.json"); 
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+
+            alert("¡Repertorio guardado y copia 'fraguel_rock_backup.json' exportada!");
         }
 
         function cargarRepertorio(id) {
             detenerMetronomo();
             const rep = repertoriosGuardados.find(r => r.id === id);
             if (!rep) return;
-            let cancionesMigradas = rep.canciones.map(item => {
-                return typeof item === 'object' ? item : { id: item, enlazada: false };
-            });
             repertorioActual = JSON.parse(JSON.stringify(rep));
-            repertorioActual.canciones = cancionesMigradas;
+            repertorioActual.canciones = rep.canciones.map(item => typeof item === 'object' ? item : { id: item, enlazada: false });
             cerrarModalRepertorios();
             render();
         }
@@ -668,16 +684,13 @@
             repertorioActual = JSON.parse(JSON.stringify(rep));
             repertorioActual.id = null;
             repertorioActual.nombre = `${repertorioActual.nombre} (Copia)`;
-            repertorioActual.canciones = repertorioActual.canciones.map(item => {
-                return typeof item === 'object' ? item : { id: item, enlazada: false };
-            });
+            repertorioActual.canciones = rep.canciones.map(item => typeof item === 'object' ? item : { id: item, enlazada: false });
             cerrarModalRepertorios();
             render();
-            alert("Has cargado una copia. Modifica lo que quieras y dale a guardar para registrarlo con otro nombre.");
         }
 
         function eliminarRepertorio(id) {
-            if (confirm("¿Estás seguro de que quieres eliminar este repertorio guardado?")) {
+            if (confirm("¿Estás seguro de que quieres eliminar este repertorio?")) {
                 repertoriosGuardados = repertoriosGuardados.filter(r => r.id !== id);
                 localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
                 if (repertorioActual.id === id) nuevoRepertorioLimpio();
@@ -685,9 +698,85 @@
             }
         }
 
-        function agregarAlRepertorio(id) { 
-            repertorioActual.canciones.push({ id: id, enlazada: false }); 
-            render(); 
+        // 1) RENDERIZADO DE LA BASE GENERAL CON LOS RECUAros DE SELECCIÓN MÚLTIPLE
+        function renderBaseGeneralList() {
+            const contBase = document.getElementById('lista-general-completa');
+            contBase.innerHTML = '';
+            if (cancionesGeneral.length === 0) {
+                contBase.innerHTML = '<p class="text-gray-400 text-center py-4 text-xs">La base de datos general está vacía.</p>';
+            } else {
+                cancionesGeneral.forEach(c => {
+                    const esMudo = (obtenerBpmNumerico(c.tempo) === 0);
+                    const div = document.createElement('div');
+                    div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs";
+                    div.setAttribute('data-search-text', `${c.titulo.toLowerCase()} ${c.tonalidad.toLowerCase()}`);
+                    
+                    if (modoAgregarAlRepertorioDirecto) {
+                        // Modo Selector: Añadir checkbox de selección múltiple
+                        div.innerHTML = `
+                            <div class="flex items-center min-w-0 flex-grow mr-2">
+                                <input type="checkbox" value="${c.id}" class="chk-cancion-selector w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-3 flex-shrink-0 cursor-pointer">
+                                <div class="truncate cursor-pointer" onclick="this.parentElement.querySelector('input').click()">
+                                    <p class="font-bold text-gray-800 text-sm">${c.titulo}</p>
+                                    <p class="text-gray-500 font-medium mt-0.5">Tono: <span class="text-indigo-600 font-bold">${c.tonalidad}</span> | Tempo: ${esMudo ? '--' : c.tempo} BPM | Duración: ${c.duracion}</p>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Modo Mantenimiento Base Tradicional: Botones individuales de editar/borrar
+                        div.innerHTML = `
+                            <div class="truncate mr-4 flex-grow">
+                                <p class="font-bold text-gray-800 text-sm">${c.titulo}</p>
+                                <p class="text-gray-500 font-medium mt-0.5">Tono: <span class="text-indigo-600 font-bold">${c.tonalidad}</span> | Tempo: ${esMudo ? '--' : c.tempo} BPM | Duración: ${c.duracion}</p>
+                            </div>
+                            <div class="flex gap-1.5 flex-shrink-0">
+                                <button onclick="abrirModalEditar(${c.id})" class="bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200 font-semibold hover:bg-amber-100">Editar</button>
+                                <button onclick="eliminarCancionGeneral(${c.id})" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 font-semibold hover:bg-red-100">Eliminar</button>
+                            </div>
+                        `;
+                    }
+                    contBase.appendChild(div);
+                });
+                filtrarCancionesSelector();
+            }
+        }
+
+        // 1) FUNCIÓN PARA PROCESAR E INSERTAR LAS CANCIONES SELECCIONADAS EN BLOQUE
+        function insertarCancionesSeleccionadas() {
+            const checkboxes = document.querySelectorAll('.chk-cancion-selector:checked');
+            if (checkboxes.length === 0) {
+                alert("Por favor, marca al menos una canción de la lista para añadir.");
+                return;
+            }
+
+            let cancionesConAlertaDuplicado = [];
+            let idsAInsertar = [];
+
+            checkboxes.forEach(cb => {
+                const idNum = Number(cb.value);
+                const cancionDatos = cancionesGeneral.find(c => c.id === idNum);
+                if (!cancionDatos) return;
+
+                const yaExiste = repertorioActual.canciones.some(item => item.id === idNum);
+                if (yaExiste) {
+                    cancionesConAlertaDuplicado.push(`• ${cancionDatos.titulo}`);
+                }
+                idsAInsertar.push(idNum);
+            });
+
+            if (cancionesConAlertaDuplicado.length > 0) {
+                const avisoMsg = `⚠️ Las siguientes canciones ya forman parte del repertorio activo:\n\n${cancionesConAlertaDuplicado.join('\n')}\n\n¿Seguro que quieres duplicarlas en el listado?`;
+                const aceptarDuplicados = confirm(avisoMsg);
+                if (!aceptarDuplicados) return; 
+            }
+
+            // Inserción en bloque al array de setlist
+            idsAInsertar.forEach(id => {
+                repertorioActual.canciones.push({ id: id, enlazada: false });
+            });
+
+            render();
+            cerrarModalBaseGeneral();
         }
         
         function quitarDelRepertorio(index) { 
@@ -716,6 +805,7 @@
             }
         }
 
+        // --- SISTEMA DRAG AND DROP REFORZADO ---
         function iniciarArrastre(e, index) {
             indiceArrastrado = index;
             e.target.classList.add('arrastrando');
@@ -729,19 +819,19 @@
 
         function alEntrarElemento(e) {
             e.preventDefault();
-            const filaTarget = e.target.closest('.elemento-arrastrable');
-            if (filaTarget) filaTarget.classList.add('sobre-vuelo');
+            const target = e.target.closest('.elemento-arrastrable');
+            if (target) target.classList.add('sobre-vuelo');
         }
 
         function alSalirElemento(e) {
-            const filaTarget = e.target.closest('.elemento-arrastrable');
-            if (filaTarget) filaTarget.classList.remove('sobre-vuelo');
+            const target = e.target.closest('.elemento-arrastrable');
+            if (target) target.classList.remove('sobre-vuelo');
         }
 
         function soltarSobreElemento(e, indiceDestino) {
             e.preventDefault();
-            const filaTarget = e.target.closest('.elemento-arrastrable');
-            if (filaTarget) filaTarget.classList.remove('sobre-vuelo');
+            const target = e.target.closest('.elemento-arrastrable');
+            if (target) target.classList.remove('sobre-vuelo');
             if (indiceArrastrado === null || indiceArrastrado === indiceDestino) return;
             
             const arr = repertorioActual.canciones;
@@ -759,34 +849,31 @@
         }
 
         function calcularTiempoTotal() {
-            let segundosTotales = 0;
+            let segs = 0;
             repertorioActual.canciones.forEach(item => {
                 const cancion = cancionesGeneral.find(c => c.id === item.id);
                 if (cancion) {
                     const [m, s] = cancion.duracion.split(':').map(Number);
-                    segundosTotales += (m * 60) + s;
+                    segs += (m * 60) + s;
                 }
             });
-            const h = Math.floor(segundosTotales / 3600);
-            const m = Math.floor((segundosTotales % 3600) / 60);
-            const s = segundosTotales % 60;
+            const h = Math.floor(segs / 3600);
+            const m = Math.floor((segs % 3600) / 60);
+            const s = segs % 60;
             return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
         function exportarDatos() {
             const backup = { canciones: cancionesGeneral, repertorios: repertoriosGuardados };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "fraguel_rock_backup.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
+            const anchor = document.createElement('a');
+            anchor.setAttribute("href", dataStr);
+            anchor.setAttribute("download", "fraguel_rock_backup.json");
+            document.body.appendChild(anchor); anchor.click(); anchor.remove();
         }
 
         function importarDatos(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const file = event.target.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
@@ -796,177 +883,32 @@
                         repertoriosGuardados = datos.repertorios;
                         localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
                         localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
-                        renderBaseGeneralList();
-                        render();
-                        alert("¡Datos sincronizados desde tu copia con éxito!");
+                        renderBaseGeneralList(); render();
+                        alert("¡Sincronizado con éxito!");
                     }
-                } catch (err) {
-                    alert("Error al leer el archivo. Asegúrate de que sea el archivo .json correcto.");
-                }
+                } catch (err) { alert("Archivo inválido."); }
             };
             reader.readAsText(file);
-        }
-
-        function renderBaseGeneralList() {
-            const contBase = document.getElementById('lista-general-completa');
-            contBase.innerHTML = '';
-            if (cancionesGeneral.length === 0) {
-                contBase.innerHTML = '<p class="text-gray-400 text-center py-4 text-sm">Base de datos vacía.</p>';
-            } else {
-                cancionesGeneral.forEach(c => {
-                    const bpmAMostrar = obtenerBpmNumerico(c.tempo) === 0 ? '--' : c.tempo;
-                    const div = document.createElement('div');
-                    div.className = "flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-200 text-xs";
-                    div.innerHTML = `
-                        <div>
-                            <p class="font-bold text-gray-800 text-sm">${c.titulo}</p>
-                            <p class="text-gray-500 font-medium mt-0.5">Tono: <span class="text-indigo-600 font-bold">${c.tonalidad}</span> | Tempo: ${bpmAMostrar} BPM | Duración: ${c.duracion}</p>
-                        </div>
-                        <div class="flex gap-1.5">
-                            <button onclick="abrirModalEditar(${c.id})" class="bg-amber-50 text-amber-700 px-3 py-1.5 rounded-lg border border-amber-200 font-semibold">Editar</button>
-                            <button onclick="eliminarCancionGeneral(${c.id})" class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg border border-red-200 font-semibold">Eliminar</button>
-                        </div>
-                    `;
-                    contBase.appendChild(div);
-                });
-            }
-        }
-
-        // --- RENDERIZADO UNIFICADO MODO METRÓNOMO ---
-        function renderPlaylistMetronomo() {
-            const playlistCont = document.getElementById('playlist-metronomo');
-            const playerTitulo = document.getElementById('metro-player-titulo');
-            const playerBpm = document.getElementById('metro-player-bpm');
-            const btnPlayerToggle = document.getElementById('btn-metro-player-toggle');
-
-            playlistCont.innerHTML = '';
-
-            if (repertorioActual.canciones.length === 0) {
-                playlistCont.innerHTML = '<p class="text-slate-500 text-center py-12 text-xs">Agrega canciones al Setlist para activar la playlist de directo.</p>';
-                playerTitulo.textContent = "Ningún tema seleccionado";
-                playerBpm.innerHTML = `-- <span class="text-xs text-slate-500 font-normal">BPM</span>`;
-                btnPlayerToggle.innerHTML = '▶';
-                btnPlayerToggle.className = "w-16 h-16 rounded-full bg-slate-700 text-slate-500 flex items-center justify-center font-black text-2xl cursor-not-allowed";
-                return;
-            }
-
-            btnPlayerToggle.className = "w-16 h-16 rounded-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 flex items-center justify-center font-black text-2xl transition shadow-lg text-white";
-
-            let idxActivoEfectivo = typeof indiceSetlistSonando === 'number' ? indiceSetlistSonando : 0;
-            let cancionActivaDatos = null;
-
-            repertorioActual.canciones.forEach((item, index) => {
-                const c = cancionesGeneral.find(cancion => cancion.id === item.id);
-                if (!c) return;
-
-                const esEsteElSonando = (indiceSetlistSonando === index);
-                if (index === idxActivoEfectivo) cancionActivaDatos = c;
-
-                const divItem = document.createElement('div');
-                if (esEsteElSonando) {
-                    divItem.className = "flex justify-between items-center bg-indigo-950/80 border-2 border-indigo-500 p-2.5 rounded-lg text-xs cursor-pointer shadow-md transition";
-                } else {
-                    divItem.className = "flex justify-between items-center bg-slate-800/60 border border-slate-800 p-2.5 rounded-lg text-xs cursor-pointer hover:bg-slate-800 transition";
-                }
-
-                divItem.onclick = () => conmutarMetronomoPorIndice(index);
-
-                const bpmNumerico = obtenerBpmNumerico(c.tempo);
-                const textoBPM = bpmNumerico === 0 ? '-- BPM' : `${c.tempo} BPM`;
-
-                divItem.innerHTML = `
-                    <div class="truncate mr-2">
-                        <p class="font-bold ${esEsteElSonando ? 'text-yellow-400' : 'text-slate-200'} truncate text-sm">${index + 1}. ${c.titulo}</p>
-                        <p class="text-slate-400 text-[10px] mt-0.5">Tono: ${c.tonalidad}  |  Duración: ${c.duracion}</p>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <span class="font-black ${esEsteElSonando ? 'text-yellow-400' : 'text-slate-300'} bg-slate-950 px-2 py-0.5 border border-slate-700 rounded text-[10px]">${textoBPM}</span>
-                        <span class="text-sm">${esEsteElSonando && bpmNumerico > 0 ? '⏱️' : '▶'}</span>
-                    </div>
-                `;
-                playlistCont.appendChild(divItem);
-            });
-
-            if (cancionActivaDatos) {
-                const bpmNumerico = obtenerBpmNumerico(cancionActivaDatos.tempo);
-                playerTitulo.textContent = `${idxActivoEfectivo + 1}. ${cancionActivaDatos.titulo}`;
-                playerBpm.innerHTML = bpmNumerico === 0 
-                    ? `-- <span class="text-xs text-slate-500 font-normal">(Sin Tempo)</span>` 
-                    : `${cancionActivaDatos.tempo} <span class="text-xs text-slate-500 font-normal">BPM</span>`;
-            }
-
-            // Manejo de estados de reproducción en el botón principal
-            if (indiceSetlistSonando !== null) {
-                const cActual = repertorioActual.canciones[idxActivoEfectivo] ? cancionesGeneral.find(o => o.id === repertorioActual.canciones[idxActivoEfectivo].id) : null;
-                const esMudo = cActual ? (obtenerBpmNumerico(cActual.tempo) === 0) : true;
-
-                btnPlayerToggle.innerHTML = esMudo ? '⏸' : '■';
-                btnPlayerToggle.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
-                btnPlayerToggle.classList.add(esMudo ? 'bg-amber-600' : 'bg-red-600', esMudo ? 'hover:bg-amber-500' : 'hover:bg-red-500');
-            } else {
-                btnPlayerToggle.innerHTML = '▶';
-                btnPlayerToggle.classList.remove('bg-red-600', 'hover:bg-red-500', 'bg-amber-600', 'hover:bg-amber-500');
-                btnPlayerToggle.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
-            }
-
-            // Sincronizar botones pequeños de las listas
-            document.querySelectorAll('.btn-metro').forEach(btn => {
-                const idBtn = Number(btn.getAttribute('data-id'));
-                let coincideAislado = (indiceSetlistSonando === `asislado-${idBtn}`);
-                let coincideSetlist = (typeof indiceSetlistSonando === 'number' && repertorioActual.canciones[indiceSetlistSonando]?.id === idBtn);
-                
-                if (coincideAislado || coincideSetlist) {
-                    btn.innerHTML = '■';
-                    btn.classList.remove('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
-                    btn.classList.add('bg-red-600', 'text-white', 'border-red-600');
-                } else {
-                    btn.innerHTML = '▶';
-                    btn.classList.remove('bg-red-600', 'text-white', 'border-red-600');
-                    btn.classList.add('bg-emerald-50', 'text-emerald-700', 'border-emerald-200');
-                }
-            });
         }
 
         function render() {
             document.getElementById('nombre-rep-actual').textContent = repertorioActual.nombre;
 
-            const contSelector = document.getElementById('lista-selector-repertorio');
-            contSelector.innerHTML = '';
-            if (cancionesGeneral.length === 0) {
-                contSelector.innerHTML = '<p class="text-gray-400 text-center py-4 text-xs">No hay canciones disponibles. Añade algunas desde el Listado de Canciones.</p>';
-            } else {
-                cancionesGeneral.forEach(c => {
-                    const div = document.createElement('div');
-                    div.className = "flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-xs shadow-sm transition hover:border-gray-300";
-                    div.setAttribute('data-search-text', `${c.titulo.toLowerCase()} ${c.tonalidad.toLowerCase()}`);
-                    
-                    const bpmNumerico = obtenerBpmNumerico(c.tempo);
-                    const labelBPM = bpmNumerico === 0 ? '-- BPM' : `${c.tempo} BPM`;
-
-                    div.innerHTML = `
-                        <div class="truncate mr-2 flex-grow">
-                            <p class="font-bold text-gray-700 truncate">${c.titulo}</p>
-                            <div class="flex items-center gap-1.5 mt-0.5 text-[10px] text-gray-400">
-                                <span>Tono: <span class="font-bold text-indigo-500">${c.tonalidad}</span></span>
-                                <span>• ${c.duracion}</span>
-                                <span>• ${labelBPM}</span>
-                                <button onclick="conmutarMetronomoSuelto(${c.id}, '${c.tempo}')" data-id="${c.id}" class="btn-metro ml-1 px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 font-bold transition">▶</button>
-                            </div>
-                        </div>
-                        <button onclick="agregarAlRepertorio(${c.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-2.5 py-1 rounded shadow-sm text-sm transition flex-shrink-0">+</button>
-                    `;
-                    contSelector.appendChild(div);
-                });
-                filtrarCancionesSelector();
-            }
-
             const contSetlist = document.getElementById('lista-setlist-final');
             contSetlist.innerHTML = '';
+            
             if (repertorioActual.canciones.length === 0) {
-                contSetlist.innerHTML = '<p class="text-gray-400 text-center py-12 text-xs">El repertorio está vacío.<br>Busca temas a la izquierda y pulsa el botón (+) para encajarlos aquí.</p>';
+                contSetlist.innerHTML = `
+                    <div class="text-center py-16 text-gray-400 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+                        <p class="text-sm font-medium">Este repertorio no tiene temas asignados.</p>
+                        <p class="text-[11px] text-gray-400 mt-1">Haz clic arriba en "➕ Añadir Canción" para importar temas de la base de datos.</p>
+                    </div>`;
                 btnImprimir.classList.add('hidden');
+                document.getElementById('btn-abrir-metronomo').classList.add('hidden');
             } else {
                 btnImprimir.classList.remove('hidden');
+                document.getElementById('btn-abrir-metronomo').classList.remove('hidden');
+                
                 repertorioActual.canciones.forEach((item, index) => {
                     const c = cancionesGeneral.find(cancion => cancion.id === item.id);
                     if (!c) return;
@@ -974,51 +916,44 @@
                     const esUltima = (index === repertorioActual.canciones.length - 1);
                     const div = document.createElement('div');
                     
-                    let clasesEnlace = "";
-                    if (item.enlazada && !esUltima) {
-                        clasesEnlace = "linea-enlace mb-5 border-l-4 border-indigo-600 rounded-l-none bg-indigo-50/80";
-                    } else {
-                        clasesEnlace = "bg-indigo-50/30 border-indigo-100";
-                    }
-
-                    div.className = `elemento-arrastrable flex justify-between items-center p-2.5 rounded-lg border text-xs shadow-sm transition ${clasesEnlace}`;
+                    let clasesEnlace = item.enlazada && !esUltima ? "linea-enlace mb-5 border-l-4 border-indigo-600 rounded-l-none bg-indigo-50/80" : "bg-indigo-50/30 border-indigo-100";
+                    div.className = `elemento-arrastrable flex justify-between items-center p-3 rounded-lg border text-xs shadow-sm transition ${clasesEnlace}`;
                     
                     div.setAttribute('draggable', 'true');
                     div.setAttribute('ondragstart', `iniciarArrastre(event, ${index})`);
-                    div.setAttribute('ondragend', 'final完rastre(event)');
+                    div.setAttribute('ondragend', 'finalizarArrastre(event)');
                     div.setAttribute('ondragover', 'event.preventDefault()');
                     div.setAttribute('ondragenter', 'alEntrarElemento(event)');
                     div.setAttribute('ondragleave', 'alSalirElemento(event)');
                     div.setAttribute('ondrop', `soltarSobreElemento(event, ${index})`);
                     
                     div.innerHTML = `
-                        <div class="flex items-center space-x-1.5 min-w-0 pointer-events-none select-none">
-                            <span class="font-black text-indigo-400 w-5 text-right">${index + 1}.</span>
-                            <span class="font-bold text-gray-800 truncate text-sm">${c.titulo}</span>
+                        <div class="flex items-center space-x-2 min-w-0 pointer-events-none select-none">
+                            <span class="font-black text-indigo-400 w-5 text-right text-sm">${index + 1}.</span>
+                            <span class="font-bold text-gray-800 truncate text-sm sm:text-base">${c.titulo}</span>
                         </div>
-                        <div class="flex items-center space-x-1 flex-shrink-0 z-20">
-                            <button onclick="conmutarMetronomoPorIndice(${index})" data-id="${c.id}" class="btn-metro text-[10px] font-bold px-1.5 py-0.5 rounded border bg-emerald-50 text-emerald-700 border-emerald-200 transition">▶</button>
-                            <span class="text-[10px] font-bold text-indigo-600 bg-white px-1.5 py-0.5 border rounded pointer-events-none select-none">${c.tonalidad}</span>
+                        <div class="flex items-center space-x-1.5 flex-shrink-0 z-20">
+                            <span class="text-[10px] sm:text-xs font-black text-indigo-600 bg-white px-2 py-0.5 border rounded select-none">${c.tonalidad}</span>
+                            <span class="text-[10px] text-gray-400 hidden sm:inline select-none">${c.duracion}</span>
                             
                             ${!esUltima ? `
-                                <button onclick="conmutarEnlace(${index})" title="Enlazar con el siguiente" class="p-1 rounded transition ${item.enlazada ? 'bg-indigo-600 text-white' : 'hover:bg-gray-200 text-gray-400'}">
+                                <button onclick="conmutarEnlace(${index})" title="Enlazar con el siguiente" class="p-1.5 rounded transition ${item.enlazada ? 'bg-indigo-600 text-white' : 'hover:bg-gray-200 text-gray-400'}">
                                     🔗
                                 </button>
                             ` : ''}
 
-                            <button onclick="moverCancion(${index}, 'subir')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500">▲</button>
-                            <button onclick="moverCancion(${index}, 'bajar')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500">▼</button>
-                            <button onclick="quitarDelRepertorio(${index})" class="text-red-500 font-bold ml-1 p-1 hover:bg-red-50 rounded">✕</button>
+                            <button onclick="moverCancion(${index}, 'subir')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500 text-sm">▲</button>
+                            <button onclick="moverCancion(${index}, 'bajar')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500 text-sm">▼</button>
+                            <button onclick="quitarDelRepertorio(${index})" class="text-red-500 font-bold ml-1 p-1.5 hover:bg-red-50 rounded text-sm">✕</button>
                         </div>
                     `;
                     contSetlist.appendChild(div);
                 });
             }
             tiempoTotalEl.textContent = calcularTiempoTotal();
-            renderPlaylistMetronomo(); 
         }
 
-        // --- IMPRESIÓN ---
+        // --- MANEJO DE IMPRESIÓN EN PAPEL ---
         btnImprimir.addEventListener('click', () => {
             detenerMetronomo();
             const body = document.getElementById('tabla-impresion-body');
@@ -1027,36 +962,30 @@
             document.getElementById('print-info-total').textContent = `Temas Totales: ${repertorioActual.canciones.length}  |  Duración: ${calcularTiempoTotal()}`;
 
             let enBloqueEnlazado = false;
-
             repertorioActual.canciones.forEach((item, index) => {
                 const c = cancionesGeneral.find(cancion => cancion.id === item.id);
                 if (c) {
                     const tr = document.createElement('tr');
                     let estiloFila = ""; let indicadorEnlace = "";
-                    
                     if (item.enlazada && (index < repertorioActual.canciones.length - 1)) {
                         estiloFila = "enlazado-print"; indicadorEnlace = " ➔ (ENGANCHADA)"; enBloqueEnlazado = true;
                     } else if (enBloqueEnlazado) {
                         estiloFila = "enlazado-print enlazado-print-fin"; enBloqueEnlazado = false;
                     }
-
                     if (estiloFila) tr.className = estiloFila;
-
-                    const bpmTexto = obtenerBpmNumerico(c.tempo) === 0 ? '--' : `${c.tempo} BPM`;
 
                     tr.innerHTML = `
                         <td style="text-align: center; font-weight: bold; font-size: 11pt;">${index + 1}</td>
                         <td style="font-weight: 700; font-size: 15pt; letter-spacing: -0.3px;">
-                            ${c.titulo} <span style="font-size: 10.5pt; color: #4f46e5; font-weight: 900; letter-spacing: 0px;">${indicadorEnlace}</span>
+                            ${c.titulo} <span style="font-size: 10.5pt; color: #4f46e5; font-weight: 900;">${indicadorEnlace}</span>
                         </td>
                         <td style="text-align: center; font-weight: 900; font-size: 12pt; color: #1e1b4b; background-color: #e4e4e7;">${c.tonalidad}</td>
-                        <td style="text-align: center; font-size: 10pt; color: #4b5563;">${bpmTexto}</td>
+                        <td style="text-align: center; font-size: 10pt; color: #4b5563;">${obtenerBpmNumerico(c.tempo) === 0 ? '--' : `${c.tempo} BPM`}</td>
                     `;
                     body.appendChild(tr);
                 }
             });
-            window.print();
-            render();
+            window.print(); render();
         });
 
         render();
