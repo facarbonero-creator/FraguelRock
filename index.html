@@ -267,8 +267,8 @@
             osc.type = 'triangle'; 
             osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
 
-            // Volumen incrementado en un 100% adicional respecto a la señal normal (Master Gain en 2.0)
-            const volumenBaseDuplicado = 2.0; 
+            // Volumen incrementado en un 400% adicional respecto a la señal normal (Master Gain en 2.0)
+            const volumenBaseDuplicado = 4.0; 
 
             gainNode.gain.setValueAtTime(volumenBaseDuplicado, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
