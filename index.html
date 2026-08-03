@@ -8,7 +8,7 @@
     <style>
         @media print {
             body { background: white; color: black; font-size: 11pt; }
-            #app-container, button, form, nav, .no-print, [id^="modal-"], .filtro-contenedor, #panel-metronomo { display: none !important; }
+            #app-container, button, form, nav, .no-print, [id^="modal-"], .filtro-contenedor { display: none !important; }
             #seccion-impresion { display: block !important; width: 100%; height: 100%; }
             @page { size: A4 portrait; margin: 15mm; }
             table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -42,7 +42,6 @@
 
     <div id="app-container" class="container mx-auto px-4 py-6 max-w-5xl flex-grow">
         
-        <!-- ENCABEZADO CON LOGO INTEGRADO -->
         <header class="mb-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b pb-4 bg-gradient-to-r from-indigo-900 to-indigo-700 p-6 rounded-xl text-white shadow-md">
             <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                 <img src="WhatsApp Image 2026-06-16 at 16.20.44.jpeg" alt="Fraguel Rock Logo" class="w-20 h-20 object-contain rounded-full bg-white p-1 shadow-inner">
@@ -52,7 +51,6 @@
                 </div>
             </div>
             
-            <!-- Botones de Control Superiores -->
             <div class="flex flex-wrap gap-2 w-full md:w-auto justify-center">
                 <button onclick="abrirModalBaseGeneral()" class="bg-indigo-600 border border-indigo-400 text-white px-4 py-2 rounded-lg font-bold shadow hover:bg-indigo-500 transition text-xs">
                     🎵 Listado Canciones (Base)
@@ -63,39 +61,17 @@
             </div>
         </header>
 
-        <!-- PANEL DE METRÓNOMO INTEGRADO -->
-        <div id="panel-metronomo" class="mb-4 bg-gray-900 text-white p-3 rounded-xl shadow-lg flex flex-wrap items-center justify-between gap-4 border border-indigo-500/30">
-            <div class="flex items-center gap-2">
-                <span class="text-xl">⏱️</span>
-                <div>
-                    <h4 class="text-xs font-bold text-yellow-400 uppercase tracking-wider">Metrónomo Potenciado (+100% Vol)</h4>
-                    <p class="text-[10px] text-gray-400">Click directo de alto impacto para ensayos y vivo</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="flex items-center gap-1.5 bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700">
-                    <label for="bpm-input" class="text-xs font-bold text-gray-300">BPM:</label>
-                    <input type="number" id="bpm-input" min="30" max="300" value="120" onchange="actualizarBpm(this.value)" class="w-16 bg-gray-900 text-yellow-400 font-black text-center text-sm border border-gray-600 rounded focus:outline-none">
-                </div>
-                <button id="btn-metronomo" onclick="toggleMetronomo()" class="bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-black px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition shadow-md flex items-center gap-1.5">
-                    ▶️ Iniciar Metrónomo
-                </button>
-            </div>
-        </div>
-
-        <!-- SECCIÓN PRINCIPAL: DISEÑADOR DE REPERTORIO -->
-        <div class="bg-indigo-50/50 p-3 rounded-lg mb-4 flex justify-between items-center border border-indigo-100/80">
+        <div class="bg-indigo-50/50 p-3 rounded-lg mb-4 text-center border border-indigo-100/80 flex justify-between items-center px-4">
             <div>
                 <span class="text-xs font-bold text-indigo-900 uppercase tracking-wider">Repertorio en elaboración:</span>
                 <span id="nombre-rep-actual" class="text-sm font-black text-indigo-600 ml-1">Nuevo Repertorio</span>
             </div>
-            <button id="btn-compartir-actual" onclick="compartirRepertorioActual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 text-xs font-bold px-3 py-1.5 rounded-lg border border-indigo-300 transition flex items-center gap-1">
+            <button onclick="generarEnlaceCompartirActual()" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border border-indigo-300 font-bold px-3 py-1 rounded-lg text-xs transition flex items-center gap-1">
                 🔗 Compartir Enlace
             </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- COLUMNA IZQUIERDA: AÑADIR AL REPERTORIO -->
             <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 flex flex-col h-[600px]">
                 <div class="border-b pb-3 mb-3">
                     <h3 class="font-black text-gray-700 uppercase tracking-wider text-xs mb-2">1. Añadir al repertorio</h3>
@@ -106,7 +82,6 @@
                 <div id="lista-selector-repertorio" class="space-y-2 overflow-y-auto flex-grow pr-1"></div>
             </div>
 
-            <!-- COLUMNA DERECHA: REPERTORIO EN ELABORACIÓN -->
             <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 flex flex-col h-[600px] justify-between">
                 <div class="flex flex-col h-[480px]">
                     <div class="flex justify-between items-center mb-3 border-b pb-2">
@@ -116,7 +91,6 @@
                             <div id="tiempo-total" class="text-lg font-black text-emerald-600">00:00:00</div>
                         </div>
                     </div>
-                    <!-- Contenedor Final -->
                     <div id="lista-setlist-final" class="space-y-3 overflow-y-auto flex-grow pr-1 pb-4"></div>
                 </div>
 
@@ -132,7 +106,6 @@
         </div>
     </div>
 
-    <!-- MODAL: BASE GENERAL -->
     <div id="modal-base-general" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-40">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl h-[85vh] flex flex-col justify-between">
             <div>
@@ -162,7 +135,6 @@
         </div>
     </div>
 
-    <!-- MODAL: FORMULARIO CANCION -->
     <div id="modal-cancion" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md">
             <h3 id="modal-titulo" class="text-xl font-bold text-gray-800 mb-4">Añadir Canción</h3>
@@ -194,7 +166,6 @@
         </div>
     </div>
 
-    <!-- MODAL: REPERTORIOS -->
     <div id="modal-repertorios" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center p-4 z-40">
         <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
@@ -210,7 +181,6 @@
         </div>
     </div>
 
-    <!-- SECCIÓN DE IMPRESIÓN -->
     <div id="seccion-impresion">
         <h1 id="print-titulo-rep" style="font-size: 24pt; font-weight: 800; margin-bottom: 2px; text-align: center; letter-spacing: -1px;">FRAGUEL ROCK</h1>
         <p id="print-info-total" style="text-align: center; font-weight: bold; margin-bottom: 20px; color: #333; font-size: 11pt; border-bottom: 2px solid #000; padding-bottom: 5px;"></p>
@@ -238,6 +208,10 @@
             canciones: [], 
         };
 
+        let audioCtx = null;
+        let metronomoInterval = null;
+        let metronomoActivoId = null;
+
         const modalBaseGeneral = document.getElementById('modal-base-general');
         const modalCancion = document.getElementById('modal-cancion');
         const modalRepertorios = document.getElementById('modal-repertorios');
@@ -247,13 +221,8 @@
 
         let indiceArrastrado = null;
 
-        // --- SINTETIZADOR DE METRÓNOMO POTENCIADO (+100% VOLUMEN) ---
-        let audioCtx = null;
-        let metronomoTimer = null;
-        let metronomoActivo = false;
-        let bpmActual = 120;
-
-        function reproducirClickPotente() {
+        // --- SISTEMA DE AUDIO (METRÓNOMO CON VOLUMEN +1000%) ---
+        function reproducirGolpeMetronomo() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
@@ -262,110 +231,100 @@
             }
 
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+            
+            // Cadena de amplificación para multiplicar el volumen x10 (1000%)
+            const gain1 = audioCtx.createGain();
+            const gain2 = audioCtx.createGain();
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1000, audioCtx.currentTime); // Tono agudo y penetrante
 
-            osc.type = 'triangle'; 
-            osc.frequency.setValueAtTime(1200, audioCtx.currentTime); 
+            // Multiplicador de ganancia masivo (+1000% sobre el nivel estándar 1.0)
+            gain1.gain.setValueAtTime(10.0, audioCtx.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
 
-            // Volumen incrementado en un 400% adicional respecto a la señal normal (Master Gain en 2.0)
-            const volumenBaseDuplicado = 4.0; 
+            gain2.gain.setValueAtTime(1.0, audioCtx.currentTime);
 
-            gainNode.gain.setValueAtTime(volumenBaseDuplicado, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+            osc.connect(gain1);
+            gain1.connect(gain2);
+            gain2.connect(audioCtx.destination);
 
             osc.start();
             osc.stop(audioCtx.currentTime + 0.08);
         }
 
-        function toggleMetronomo() {
-            const btn = document.getElementById('btn-metronomo');
-            if (metronomoActivo) {
-                clearInterval(metronomoTimer);
-                metronomoActivo = false;
-                btn.textContent = "▶️ Iniciar Metrónomo";
-                btn.className = "bg-emerald-500 hover:bg-emerald-600 text-gray-950 font-black px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition shadow-md flex items-center gap-1.5";
-            } else {
-                metronomoActivo = true;
-                btn.textContent = "⏹️ Detener Metrónomo";
-                btn.className = "bg-red-500 hover:bg-red-600 text-white font-black px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition shadow-md flex items-center gap-1.5";
-                
-                reproducirClickPotente();
-                const intervaloMs = (60 / bpmActual) * 1000;
-                metronomoTimer = setInterval(reproducirClickPotente, intervaloMs);
-            }
-        }
-
-        function actualizarBpm(val) {
-            bpmActual = Math.max(30, Math.min(300, Number(val) || 120));
-            document.getElementById('bpm-input').value = bpmActual;
-            if (metronomoActivo) {
-                toggleMetronomo();
-                toggleMetronomo();
-            }
-        }
-
-        function fijarBpmMetronomo(bpm) {
-            if (bpm) {
-                actualizarBpm(bpm);
-            }
-        }
-
-        // --- SISTEMA DE ENLACES COMPARTIDOS ---
-        function generarEnlaceRepertorio(repObj) {
-            const paquete = {
-                nombre: repObj.nombre,
-                canciones: repObj.canciones,
-                cancionesDetalle: repObj.canciones.map(item => {
-                    return cancionesGeneral.find(c => c.id === item.id);
-                }).filter(Boolean)
-            };
-
-            const jsonStr = JSON.stringify(paquete);
-            const encoded = encodeURIComponent(jsonStr);
-            return `${window.location.origin}${window.location.pathname}#share=${encoded}`;
-        }
-
-        function compartirRepertorioActual() {
-            if (repertorioActual.canciones.length === 0) {
-                alert("Añade canciones al repertorio antes de compartirlo.");
+        function conmutarMetronomo(id, bpm) {
+            if (metronomoActivoId === id) {
+                detenerMetronomo();
+                render();
                 return;
             }
-            const url = generarEnlaceRepertorio(repertorioActual);
-            copiarUrlAlPortapapeles(url);
+
+            detenerMetronomo();
+            metronomoActivoId = id;
+            
+            const intervaloMs = (60 / Number(bpm)) * 1000;
+            reproducirGolpeMetronomo();
+            metronomoInterval = setInterval(reproducirGolpeMetronomo, intervaloMs);
+            render();
         }
 
-        function compartirRepertorioPorId(id) {
-            const rep = repertoriosGuardados.find(r => r.id === id);
-            if (!rep) return;
-            const url = generarEnlaceRepertorio(rep);
-            copiarUrlAlPortapapeles(url);
+        function detenerMetronomo() {
+            if (metronomoInterval) {
+                clearInterval(metronomoInterval);
+                metronomoInterval = null;
+            }
+            metronomoActivoId = null;
         }
 
-        function copiarUrlAlPortapapeles(url) {
-            navigator.clipboard.writeText(url).then(() => {
-                alert("¡Enlace generado y copiado al portapapeles! Pásaselo a tus compañeros para que se abra automáticamente.");
-            }).catch(() => {
-                prompt("Copia este enlace para enviarlo:", url);
-            });
+        // --- SISTEMA DE COMPARTIR POR ENLACE ---
+        function generarEnlaceCompartir(repertorio) {
+            try {
+                const datosEmpaquetados = {
+                    nombre: repertorio.nombre,
+                    canciones: repertorio.canciones,
+                    detallesCanciones: repertorio.canciones.map(item => {
+                        return cancionesGeneral.find(c => c.id === item.id);
+                    }).filter(Boolean)
+                };
+
+                const jsonStr = JSON.stringify(datosEmpaquetados);
+                const b64Str = btoa(unescape(encodeURIComponent(jsonStr)));
+                
+                const urlCompartir = `${window.location.origin}${window.location.pathname}#rep=${b64Str}`;
+                
+                navigator.clipboard.writeText(urlCompartir).then(() => {
+                    alert("¡Enlace copiado al portapapeles!\n\nEnvía este enlace a tu compañero. Al abrirlo, se le cargará este repertorio en su pantalla.");
+                }).catch(() => {
+                    prompt("Copia este enlace para enviarlo a tu compañero:", urlCompartir);
+                });
+            } catch (err) {
+                alert("Error al generar el enlace de compartición.");
+            }
         }
 
-        function detectarRepertorioCompartido() {
+        function generarEnlaceCompartirActual() {
+            if (repertorioActual.canciones.length === 0) {
+                alert("Añade algunas canciones al repertorio antes de compartirlo.");
+                return;
+            }
+            generarEnlaceCompartir(repertorioActual);
+        }
+
+        function comprobarYProcesarEnlaceCompartido() {
             const hash = window.location.hash;
-            if (hash.startsWith('#share=')) {
+            if (hash.startsWith('#rep=')) {
                 try {
-                    const encodedData = hash.replace('#share=', '');
-                    const jsonStr = decodeURIComponent(encodedData);
-                    const paquete = JSON.parse(jsonStr);
+                    const b64Str = hash.replace('#rep=', '');
+                    const jsonStr = decodeURIComponent(escape(atob(b64Str)));
+                    const datos = JSON.parse(jsonStr);
 
-                    if (paquete && paquete.nombre && Array.isArray(paquete.canciones)) {
-                        // Incorporar canciones faltantes a la base general local si no existen
-                        if (Array.isArray(paquete.cancionesDetalle)) {
-                            paquete.cancionesDetalle.forEach(cDetalle => {
-                                if (!cancionesGeneral.some(c => c.id === cDetalle.id)) {
-                                    cancionesGeneral.push(cDetalle);
+                    if (datos && datos.nombre && datos.canciones) {
+                        // Incorporar canciones desconocidas a la base general local
+                        if (datos.detallesCanciones && Array.isArray(datos.detallesCanciones)) {
+                            datos.detallesCanciones.forEach(cExt => {
+                                if (!cancionesGeneral.some(c => c.id === cExt.id)) {
+                                    cancionesGeneral.push(cExt);
                                 }
                             });
                             localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
@@ -373,25 +332,27 @@
 
                         repertorioActual = {
                             id: Date.now(),
-                            nombre: `${paquete.nombre} (Compartido)`,
-                            canciones: paquete.canciones
+                            nombre: `${datos.nombre} (Compartido)`,
+                            canciones: datos.canciones
                         };
 
-                        // Guardar automáticamente en repertorios almacenados
-                        repertoriosGuardados.push({ ...repertorioActual });
-                        localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
+                        renderBaseGeneralList();
+                        render();
 
-                        // Limpiar Hash
-                        history.replaceState(null, null, ' ');
-                        alert(`¡Repertorio compartido "${paquete.nombre}" cargado y guardado en tu aplicación!`);
+                        // Limpiar URL sin recargar la página
+                        history.replaceState(null, null, window.location.pathname);
+                        
+                        setTimeout(() => {
+                            alert(`¡Repertorio "${datos.nombre}" cargado con éxito desde el enlace compartido!`);
+                        }, 300);
                     }
                 } catch (e) {
-                    console.error("Error al procesar el enlace compartido:", e);
+                    console.error("Error al decodificar el repertorio del enlace:", e);
                 }
             }
         }
 
-        // --- GESTIÓN DE MODALES Y DATOS ---
+        // --- MÓDALES Y GESTIÓN ---
         function abrirModalBaseGeneral() { modalBaseGeneral.classList.remove('hidden'); renderBaseGeneralList(); }
         function cerrarModalBaseGeneral() { modalBaseGeneral.classList.add('hidden'); }
 
@@ -481,11 +442,11 @@
                             <p class="font-bold text-gray-800">${rep.nombre}</p>
                             <p class="text-xs text-gray-500">${rep.canciones.length} temas asignados</p>
                         </div>
-                        <div class="flex gap-1.5 flex-wrap">
+                        <div class="flex gap-1.5 flex-wrap justify-end">
                             <button onclick="cargarRepertorio(${rep.id})" class="bg-indigo-600 text-white px-2.5 py-1.5 rounded font-semibold text-xs hover:bg-indigo-700">Cargar</button>
-                            <button onclick="compartirRepertorioPorId(${rep.id})" class="bg-indigo-100 text-indigo-700 border border-indigo-300 px-2 py-1 rounded font-semibold text-xs hover:bg-indigo-200" title="Generar enlace">🔗</button>
-                            <button onclick="duplicarRepertorio(${rep.id})" class="bg-amber-50 text-amber-700 border border-amber-200 px-2 py-1 rounded font-semibold text-xs hover:bg-amber-100">Copia</button>
-                            <button onclick="eliminarRepertorio(${rep.id})" class="text-red-500 hover:bg-red-50 p-1 rounded font-bold">🗑️</button>
+                            <button onclick="generarEnlaceCompartirGuardado(${rep.id})" class="bg-indigo-100 text-indigo-700 border border-indigo-300 px-2.5 py-1.5 rounded font-semibold text-xs hover:bg-indigo-200">🔗 Enlace</button>
+                            <button onclick="duplicarRepertorio(${rep.id})" class="bg-amber-50 text-amber-700 border border-amber-200 px-2.5 py-1.5 rounded font-semibold text-xs hover:bg-amber-100">Duplicar</button>
+                            <button onclick="eliminarRepertorio(${rep.id})" class="text-red-500 hover:bg-red-50 p-1.5 rounded font-bold">🗑️</button>
                         </div>
                     `;
                     contenedor.appendChild(div);
@@ -494,9 +455,15 @@
             modalRepertorios.classList.remove('hidden');
         }
 
+        function generarEnlaceCompartirGuardado(id) {
+            const rep = repertoriosGuardados.find(r => r.id === id);
+            if (rep) generarEnlaceCompartir(rep);
+        }
+
         function cerrarModalRepertorios() { modalRepertorios.classList.add('hidden'); }
 
         function nuevoRepertorioLimpio() {
+            detenerMetronomo();
             repertorioActual = { id: null, nombre: "Nuevo Repertorio", canciones: [] };
             cerrarModalRepertorios();
             render();
@@ -524,10 +491,14 @@
 
             localStorage.setItem('FR_repertorios', JSON.stringify(repertoriosGuardados));
             render();
-            alert("¡Repertorio guardado correctamente!");
+            
+            if (confirm("¡Repertorio guardado correctamente!\n\n¿Quieres copiar un enlace ahora para compartir este repertorio con un compañero?")) {
+                generarEnlaceCompartir(repertorioActual);
+            }
         }
 
         function cargarRepertorio(id) {
+            detenerMetronomo();
             const rep = repertoriosGuardados.find(r => r.id === id);
             if (!rep) return;
             let cancionesMigradas = rep.canciones.map(item => {
@@ -643,7 +614,7 @@
             return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
         }
 
-        // --- BACKUPS NAS ---
+        // --- COPIAS DE SEGURIDAD ---
         function exportarDatos() {
             const backup = { canciones: cancionesGeneral, repertorios: repertoriosGuardados };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup));
@@ -718,7 +689,7 @@
                     div.innerHTML = `
                         <div class="truncate mr-2">
                             <p class="font-bold text-gray-700 truncate">${c.titulo}</p>
-                            <p class="text-[10px] text-gray-400">Tono: <span class="font-bold text-indigo-500">${c.tonalidad}</span> • ${c.duracion}</p>
+                            <p class="text-[10px] text-gray-400">Tono: <span class="font-bold text-indigo-500">${c.tonalidad}</span> • ${c.tempo} BPM • ${c.duracion}</p>
                         </div>
                         <button onclick="agregarAlRepertorio(${c.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-2.5 py-1 rounded shadow-sm text-sm transition">+</button>
                     `;
@@ -748,6 +719,8 @@
                         clasesEnlace = "bg-indigo-50/30 border-indigo-100";
                     }
 
+                    const estaSonando = (metronomoActivoId === item.id);
+
                     div.className = `elemento-arrastrable flex justify-between items-center p-2.5 rounded-lg border text-xs shadow-sm transition ${clasesEnlace}`;
                     
                     div.setAttribute('draggable', 'true');
@@ -764,20 +737,17 @@
                             <span class="font-bold text-gray-800 truncate text-sm">${c.titulo}</span>
                         </div>
                         <div class="flex items-center space-x-1 flex-shrink-0 z-20">
-                            <!-- Botón para transferir Tempo al Metrónomo -->
-                            <button onclick="fijarBpmMetronomo(${c.tempo})" title="Sincronizar BPM con metrónomo" class="text-[10px] font-bold text-yellow-700 bg-yellow-100 px-1.5 py-0.5 border border-yellow-300 rounded hover:bg-yellow-200">
-                                ⏱️ ${c.tempo}
-                            </button>
                             <span class="text-[10px] font-bold text-indigo-600 bg-white px-1.5 py-0.5 border rounded pointer-events-none select-none">${c.tonalidad}</span>
                             
-                            <!-- Botón de Enlace -->
+                            <button onclick="conmutarMetronomo(${item.id}, ${c.tempo})" title="Metrónomo super amplificado (${c.tempo} BPM)" class="px-2 py-0.5 rounded text-[11px] font-bold transition flex items-center gap-1 ${estaSonando ? 'bg-emerald-600 text-white animate-pulse' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                                ⏱️ ${c.tempo}
+                            </button>
+
                             ${!esUltima ? `
                                 <button onclick="conmutarEnlace(${index})" title="Enlazar con el siguiente tema" class="p-1 rounded transition ${item.enlazada ? 'bg-indigo-600 text-white' : 'hover:bg-gray-200 text-gray-400'}">
                                     🔗
                                 </button>
                             ` : ''}
-
-                            <!-- Ajustes Finos -->
                             <button onclick="moverCancion(${index}, 'subir')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500">▲</button>
                             <button onclick="moverCancion(${index}, 'bajar')" class="p-1 hover:bg-gray-200 rounded font-bold text-gray-500">▼</button>
                             <button onclick="quitarDelRepertorio(${index})" class="text-red-500 font-bold ml-1 p-1 hover:bg-red-50 rounded">✕</button>
@@ -834,8 +804,8 @@
         });
 
         // --- INICIALIZACIÓN ---
-        detectarRepertorioCompartido();
         render();
+        comprobarYProcesarEnlaceCompartido();
     </script>
 </body>
 </html>
