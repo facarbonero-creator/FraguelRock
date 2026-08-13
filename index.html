@@ -128,67 +128,82 @@
     </div>
 
     <!-- REPRODUCTOR DE METRÓNOMO FULLSCREEN -->
-    <div id="player-fullscreen" class="fixed inset-0 bg-slate-950 text-white z-50 hidden flex flex-col justify-between p-3 md:p-4 select-none h-screen w-screen overflow-hidden">
+    <div id="player-fullscreen" class="fixed inset-0 bg-[#090d16] text-white z-50 hidden flex flex-col justify-between p-3 md:p-5 select-none h-screen w-screen overflow-hidden">
         
         <!-- Cabecera -->
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2 h-10 flex-shrink-0">
+        <div class="flex justify-between items-center border-b border-slate-800/80 pb-2.5 h-10 flex-shrink-0">
             <div class="truncate mr-2 flex items-center gap-3">
                 <span class="text-amber-400 text-[10px] md:text-xs font-black tracking-widest uppercase">EN DIRECTO • METRÓNOMO</span>
                 <h2 id="player-nombre-rep" class="text-xs md:text-sm font-bold text-slate-400 truncate border-l border-slate-800 pl-3">Repertorio</h2>
             </div>
-            <button onclick="cerrarPlayerMetronomo()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded-lg text-xs font-bold transition flex-shrink-0">
+            <button onclick="cerrarPlayerMetronomo()" class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-3.5 py-1 rounded-lg text-xs font-bold transition flex-shrink-0 border border-slate-700/50">
                 ✕ Salir
             </button>
         </div>
 
         <!-- Área Principal (2 Columnas: Izq Setlist / Der Controles + Canción) -->
-        <div class="flex-grow flex flex-col md:flex-row gap-3 py-2 min-h-0 items-stretch overflow-hidden">
+        <div class="flex-grow flex flex-col md:flex-row gap-4 py-3 min-h-0 items-stretch overflow-hidden">
             
-            <!-- LISTA LATERAL (Mantiene su proporción intacta) -->
-            <div class="w-full md:w-1/3 lg:w-1/4 bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 flex flex-col h-36 md:h-full flex-shrink-0 overflow-hidden">
-                <h4 class="text-[11px] font-black text-slate-400 uppercase border-b border-slate-800 pb-1.5 mb-1.5 px-1 flex justify-between items-center">
+            <!-- LISTA LATERAL -->
+            <div class="w-full md:w-1/3 lg:w-1/4 bg-[#0d1322] border border-slate-800/80 rounded-2xl p-3 flex flex-col h-36 md:h-full flex-shrink-0 overflow-hidden shadow-2xl">
+                <h4 class="text-[11px] font-black text-slate-400 uppercase border-b border-slate-800/80 pb-2 mb-2 px-1 flex justify-between items-center">
                     <span>📋 Repertorio</span>
                     <span id="player-contador-lista" class="text-amber-400 font-bold"></span>
                 </h4>
-                <div id="player-lista-lateral" class="space-y-1 overflow-y-auto flex-grow pr-1"></div>
+                <div id="player-lista-lateral" class="space-y-1.5 overflow-y-auto flex-grow pr-1"></div>
             </div>
 
-            <!-- COLUMNA DERECHA: BOTONERA ARRIBA (2/3) + CANCIÓN ABAJO (1/3) -->
-            <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col gap-3 flex-grow min-h-0 overflow-hidden">
+            <!-- COLUMNA DERECHA: BOTONERA PULIDA (2/3) + CANCIÓN ABAJO (1/3) -->
+            <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col gap-4 flex-grow min-h-0 overflow-hidden">
                 
-                <!-- SECCIÓN SUPERIOR (2/3): BOTONERA Y CONTROLES GIGANTES -->
-                <div class="flex-[2] bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col justify-center items-center gap-4 shadow-xl relative overflow-hidden">
+                <!-- SECCIÓN SUPERIOR (2/3): BOTONERA PULIDA ESTILO REFERENCIA -->
+                <div class="flex-[2] bg-[#0d1322] border border-slate-800/80 rounded-2xl p-4 sm:p-6 flex flex-col justify-center items-center gap-6 shadow-2xl relative overflow-hidden">
                     
-                    <!-- Ajuste Fino BPM arriba -->
-                    <div class="flex justify-center items-center gap-2 sm:gap-4 bg-slate-950/60 px-4 py-2 rounded-xl border border-slate-800">
-                        <button onclick="ajustarBpmPlayer(-5)" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-lg text-xs md:text-sm border border-slate-700">-5</button>
-                        <button onclick="ajustarBpmPlayer(-1)" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-lg text-xs md:text-sm border border-slate-700">-1</button>
-                        <span class="text-[11px] text-amber-400 font-black uppercase px-2 tracking-wider">Ajuste BPM</span>
-                        <button onclick="ajustarBpmPlayer(1)" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-lg text-xs md:text-sm border border-slate-700">+1</button>
-                        <button onclick="ajustarBpmPlayer(5)" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-lg text-xs md:text-sm border border-slate-700">+5</button>
+                    <!-- PÍLDORA DE AJUSTE DE BPM -->
+                    <div class="flex justify-center items-center gap-2 sm:gap-3 bg-[#080c14] px-3 sm:px-4 py-2 rounded-2xl border border-slate-800/90 shadow-inner">
+                        <button onclick="ajustarBpmPlayer(-5)" class="bg-[#172033] hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-xl text-xs sm:text-sm border border-slate-700/60 shadow transition">-5</button>
+                        <button onclick="ajustarBpmPlayer(-1)" class="bg-[#172033] hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-xl text-xs sm:text-sm border border-slate-700/60 shadow transition">-1</button>
+                        <span class="text-[11px] sm:text-xs text-amber-400 font-black uppercase px-2 sm:px-4 tracking-widest">AJUSTE BPM</span>
+                        <button onclick="ajustarBpmPlayer(1)" class="bg-[#172033] hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-xl text-xs sm:text-sm border border-slate-700/60 shadow transition">+1</button>
+                        <button onclick="ajustarBpmPlayer(5)" class="bg-[#172033] hover:bg-slate-700 active:scale-95 text-slate-200 font-black px-3.5 py-1.5 rounded-xl text-xs sm:text-sm border border-slate-700/60 shadow transition">+5</button>
                     </div>
 
-                    <!-- Botones Principales de Reproducción en Grande -->
-                    <div class="flex justify-center items-center gap-4 sm:gap-8 w-full max-w-2xl px-2">
-                        <button onclick="anteriorTemaPlayer()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-black h-20 sm:h-28 w-24 sm:w-32 rounded-2xl text-3xl sm:text-4xl flex justify-center items-center border border-slate-700 shadow-lg transition">
-                            ⏮️
+                    <!-- BOTONES PRINCIPALES CON ESTILO PULIDO Y VECTORIAL -->
+                    <div class="flex justify-center items-center gap-4 sm:gap-6 w-full max-w-2xl px-2">
+                        
+                        <!-- Anterior -->
+                        <button onclick="anteriorTemaPlayer()" class="bg-[#1a2336] hover:bg-[#222d45] active:scale-95 text-slate-300 h-20 sm:h-28 w-24 sm:w-32 rounded-2xl flex justify-center items-center border border-slate-700/50 shadow-xl transition group">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 fill-current text-sky-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                            </svg>
                         </button>
                         
-                        <button id="btn-player-play" onclick="conmutarPlayPlayer()" class="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black h-24 sm:h-32 flex-grow max-w-md rounded-3xl text-2xl sm:text-4xl flex justify-center items-center shadow-xl shadow-emerald-950/60 transition tracking-wider">
-                            ▶️ PLAY
+                        <!-- PLAY / PAUSA -->
+                        <button id="btn-player-play" onclick="conmutarPlayPlayer()" class="bg-[#10b981] hover:bg-[#059669] active:scale-95 text-slate-950 font-black h-24 sm:h-32 flex-grow max-w-md rounded-[2rem] sm:rounded-[2.5rem] flex justify-center items-center shadow-2xl shadow-emerald-950/80 transition-all gap-3 sm:gap-4 border border-emerald-400/30">
+                            <!-- Icono dinámico inyectado por JavaScript -->
+                            <div id="btn-player-icon-container" class="bg-white/20 p-2 sm:p-2.5 rounded-xl flex items-center justify-center">
+                                <svg id="btn-player-icon" class="w-7 h-7 sm:w-9 sm:h-9 fill-current text-slate-950" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
+                            <span id="btn-player-text" class="text-2xl sm:text-4xl font-black tracking-wider">PLAY</span>
                         </button>
 
-                        <button onclick="siguienteTemaPlayer()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-white font-black h-20 sm:h-28 w-24 sm:w-32 rounded-2xl text-3xl sm:text-4xl flex justify-center items-center border border-slate-700 shadow-lg transition">
-                            ⏭️
+                        <!-- Siguiente -->
+                        <button onclick="siguienteTemaPlayer()" class="bg-[#1a2336] hover:bg-[#222d45] active:scale-95 text-slate-300 h-20 sm:h-28 w-24 sm:w-32 rounded-2xl flex justify-center items-center border border-slate-700/50 shadow-xl transition group">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 fill-current text-sky-400 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                            </svg>
                         </button>
                     </div>
+
                 </div>
 
                 <!-- SECCIÓN INFERIOR (1/3): INFORMACIÓN DEL TEMA ACTUAL -->
-                <div id="player-bg-flash" class="flex-1 bg-slate-900/60 border border-slate-800/90 rounded-2xl p-3 flex flex-col justify-between items-center text-center transition-colors duration-100 overflow-hidden relative">
+                <div id="player-bg-flash" class="flex-1 bg-[#0d1322] border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between items-center text-center transition-colors duration-100 overflow-hidden relative shadow-2xl">
                     
                     <div class="w-full flex justify-between items-center px-2">
-                        <span class="bg-indigo-900/80 text-indigo-200 font-black text-[10px] md:text-xs px-3 py-0.5 rounded-full border border-indigo-700/50">
+                        <span class="bg-indigo-950/80 text-indigo-300 font-black text-[10px] md:text-xs px-3.5 py-1 rounded-full border border-indigo-700/40">
                             Pista <span id="player-index-num">1</span> de <span id="player-total-num">10</span>
                         </span>
                         <div id="player-siguiente-container" class="text-slate-400 text-xs font-medium truncate">
@@ -197,16 +212,16 @@
                     </div>
 
                     <!-- Título del Tema -->
-                    <h1 id="player-titulo-cancion" class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white uppercase leading-tight line-clamp-1 my-auto">
+                    <h1 id="player-titulo-cancion" class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-white uppercase leading-tight line-clamp-1 my-auto drop-shadow">
                         Título de la Canción
                     </h1>
 
                     <!-- Tono y BPM -->
                     <div class="flex justify-center items-center gap-3">
-                        <span class="bg-slate-950/80 text-amber-400 px-3 py-1 rounded-xl border border-slate-800 text-xs md:text-sm font-bold">
+                        <span class="bg-[#080c14] text-amber-400 px-3.5 py-1 rounded-xl border border-slate-800/80 text-xs md:text-sm font-bold shadow-inner">
                             Tono: <strong id="player-tono" class="text-white text-sm md:text-base">Am</strong>
                         </span>
-                        <span class="bg-slate-950/80 text-emerald-400 px-4 py-1 rounded-xl border border-slate-800 text-xs md:text-sm font-bold flex items-center gap-1.5">
+                        <span class="bg-[#080c14] text-emerald-400 px-4 py-1 rounded-xl border border-slate-800/80 text-xs md:text-sm font-bold flex items-center gap-1.5 shadow-inner">
                             <strong id="player-bpm" class="text-white text-2xl md:text-3xl font-black">120</strong> <span class="text-[10px] md:text-xs font-normal">BPM</span>
                         </span>
                     </div>
@@ -461,10 +476,10 @@
                 const esActiva = (idx === playerIndiceActual);
                 const btn = document.createElement('button');
                 btn.onclick = () => seleccionarTemaPlayer(idx);
-                btn.className = `w-full text-left p-1.5 rounded-lg text-xs flex justify-between items-center transition ${
+                btn.className = `w-full text-left p-2 rounded-xl text-xs flex justify-between items-center transition ${
                     esActiva 
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-md' 
-                        : 'hover:bg-slate-800 text-slate-300 font-medium'
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-lg' 
+                        : 'hover:bg-slate-800/60 text-slate-300 font-medium'
                 }`;
 
                 btn.innerHTML = `
@@ -476,14 +491,19 @@
                 contLista.appendChild(btn);
             });
 
-            // Botón Play
+            // Actualizar estilo del botón Play / Pausa e Icono Vectorial
             const btnPlay = document.getElementById('btn-player-play');
+            const btnText = document.getElementById('btn-player-text');
+            const iconSvg = document.getElementById('btn-player-icon');
+
             if (playerSonando) {
-                btnPlay.textContent = "⏸️ PAUSA";
-                btnPlay.className = "bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black h-24 sm:h-32 flex-grow max-w-md rounded-3xl text-2xl sm:text-4xl flex justify-center items-center shadow-xl shadow-amber-950/60 transition tracking-wider";
+                btnText.textContent = "PAUSA";
+                btnPlay.className = "bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black h-24 sm:h-32 flex-grow max-w-md rounded-[2rem] sm:rounded-[2.5rem] flex justify-center items-center shadow-2xl shadow-amber-950/80 transition-all gap-3 sm:gap-4 border border-amber-300/30";
+                iconSvg.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
-                btnPlay.textContent = "▶️ PLAY";
-                btnPlay.className = "bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black h-24 sm:h-32 flex-grow max-w-md rounded-3xl text-2xl sm:text-4xl flex justify-center items-center shadow-xl shadow-emerald-950/60 transition tracking-wider";
+                btnText.textContent = "PLAY";
+                btnPlay.className = "bg-[#10b981] hover:bg-[#059669] active:scale-95 text-slate-950 font-black h-24 sm:h-32 flex-grow max-w-md rounded-[2rem] sm:rounded-[2.5rem] flex justify-center items-center shadow-2xl shadow-emerald-950/80 transition-all gap-3 sm:gap-4 border border-emerald-400/30";
+                iconSvg.innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
         }
 
