@@ -1,0 +1,262 @@
+{
+  "nombre": "REPERTORIO COMPLETO SEPT26",
+  "duracionTotal": "02:10:39",
+  "canciones": [
+    {
+      "orden": 1,
+      "titulo": "VOY A PASARMELO BIEN",
+      "tonalidad": "E",
+      "bpm": 148,
+      "duracion": "03:45",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 2,
+      "titulo": "MAR ADENTRO",
+      "tonalidad": "Cm",
+      "bpm": 140,
+      "duracion": "04:10",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 3,
+      "titulo": "ANTES DE QUE CUENTE 10",
+      "tonalidad": "F#m",
+      "bpm": 150,
+      "duracion": "04:40",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 4,
+      "titulo": "VIVIENDO DEPRISA",
+      "tonalidad": "D",
+      "bpm": 156,
+      "duracion": "03:15",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 5,
+      "titulo": "SUFRE MAMÓN",
+      "tonalidad": "Cm",
+      "bpm": 172,
+      "duracion": "03:10",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 6,
+      "titulo": "RADIO GAGA",
+      "tonalidad": "E",
+      "bpm": 1,
+      "duracion": "02:30",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 7,
+      "titulo": "TAKE ON ME",
+      "tonalidad": "D",
+      "bpm": 168,
+      "duracion": "04:15",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 8,
+      "titulo": "TU ENEMIGO",
+      "tonalidad": "Gm",
+      "bpm": 90,
+      "duracion": "04:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 9,
+      "titulo": "VENECIA",
+      "tonalidad": "C",
+      "bpm": 172,
+      "duracion": "05:25",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 10,
+      "titulo": "LA CASA POR EL TEJADO",
+      "tonalidad": "F",
+      "bpm": 150,
+      "duracion": "04:45",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 11,
+      "titulo": "BAILA MORENA",
+      "tonalidad": "Gm",
+      "bpm": 122,
+      "duracion": "04:25",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 12,
+      "titulo": "MIX DANCE",
+      "tonalidad": "Gm",
+      "bpm": 130,
+      "duracion": "05:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 13,
+      "titulo": "INSURRECCIÓN",
+      "tonalidad": "G - A",
+      "bpm": 128,
+      "duracion": "03:45",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 14,
+      "titulo": "EMBORRACHARME",
+      "tonalidad": "G",
+      "bpm": 156,
+      "duracion": "03:30",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 15,
+      "titulo": "UNA FOTO EN B/N",
+      "tonalidad": "D",
+      "bpm": 139,
+      "duracion": "03:30",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 16,
+      "titulo": "EL FIN DEL MUNDO",
+      "tonalidad": "F",
+      "bpm": 0,
+      "duracion": "03:10",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 17,
+      "titulo": "CUANDO EL MAR TE TENGA",
+      "tonalidad": "F",
+      "bpm": 138,
+      "duracion": "03:40",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 18,
+      "titulo": "INSOPORTABLE",
+      "tonalidad": "E",
+      "bpm": 131,
+      "duracion": "04:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 19,
+      "titulo": "MIX ESTOPA",
+      "tonalidad": "Am",
+      "bpm": 152,
+      "duracion": "04:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 20,
+      "titulo": "BUSCANDO EL SOL",
+      "tonalidad": "G",
+      "bpm": 162,
+      "duracion": "04:10",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 21,
+      "titulo": "NI TU NI NADIE",
+      "tonalidad": "A",
+      "bpm": 138,
+      "duracion": "03:50",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 22,
+      "titulo": "LA FUERZA DEL DESTINO",
+      "tonalidad": "A",
+      "bpm": 109,
+      "duracion": "03:10",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 23,
+      "titulo": "VIDEO KILLED RADIO STAR",
+      "tonalidad": "C",
+      "bpm": 132,
+      "duracion": "02:15",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 24,
+      "titulo": "I WANT TO BREAK FREE",
+      "tonalidad": "D",
+      "bpm": 107,
+      "duracion": "04:15",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 25,
+      "titulo": "ANTES VER EL SOL",
+      "tonalidad": "A",
+      "bpm": 138,
+      "duracion": "04:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 26,
+      "titulo": "20 DE ABRIL",
+      "tonalidad": "Dm ",
+      "bpm": 224,
+      "duracion": "03:55",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 27,
+      "titulo": "PACTO ENTRE CABALLEROS",
+      "tonalidad": "D",
+      "bpm": 208,
+      "duracion": "04:15",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 28,
+      "titulo": "PRINCESAS (+EXTRAS)",
+      "tonalidad": "G",
+      "bpm": 132,
+      "duracion": "05:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 29,
+      "titulo": "NEVER GONNA GIVE YOU UP",
+      "tonalidad": "Am",
+      "bpm": 117,
+      "duracion": "04:00",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 30,
+      "titulo": "MIX LEIVA",
+      "tonalidad": "C",
+      "bpm": 128,
+      "duracion": "07:20",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 31,
+      "titulo": "MIX LOCO",
+      "tonalidad": "Bb",
+      "bpm": 202,
+      "duracion": "05:59",
+      "enlazadaConSiguiente": false
+    },
+    {
+      "orden": 32,
+      "titulo": "MIX ROCK 80",
+      "tonalidad": "Am",
+      "bpm": 126,
+      "duracion": "03:35",
+      "enlazadaConSiguiente": false
+    }
+  ]
+}
