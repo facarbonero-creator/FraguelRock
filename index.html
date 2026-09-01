@@ -547,65 +547,74 @@
             }
         }
 
-        // --- SISTEMA DE ENLACES ULTRA CORTOS (SOLO IDs Y ESTADOS) ---
-        function generarEnlaceCompartir(repertorio) {
+        // --- SISTEMA DE ENLACES AUTOGENERADOS VÍA API IS.GD CON ?r= ---
+        async function generarEnlaceCompartir(repertorio) {
             try {
-                // En lugar de enviar todo el objeto de las canciones, 
-                // enviamos solo un array ligero: [ [id1, enlazada1], [id2, enlazada2], ... ]
-                const estructuraLigera = {
-                    n: repertorio.nombre,
-                    c: repertorio.canciones.map(item => [item.id, item.enlazada ? 1 : 0])
-                };
-        
-                const jsonStr = JSON.stringify(estructuraLigera);
+                const jsonStr = JSON.stringify(repertorio);
                 const comprimido = LZString.compressToEncodedURIComponent(jsonStr);
-                const urlCompartir = `${window.location.origin}${window.location.pathname}#r=${comprimido}`;
                 
-                navigator.clipboard.writeText(urlCompartir).then(() => {
-                    alert(`¡Enlace corto copiado al portapapeles!\n\nRepertorio: "${repertorio.nombre}"`);
-                }).catch(() => {
-                    prompt("Copia este enlace:", urlCompartir);
-                });
-            } catch (err) { 
-                alert("Error al generar el enlace corto."); 
+                // Formateamos usando '?' para que la API no descarte la cadena comprimida
+                const urlLargaConQuery = `${window.location.origin}${window.location.pathname}?r=${comprimido}`;
+
+                // Petición a la API de is.gd
+                const apiUrl = `https://is.gd/create.php?format=json&url=${encodeURIComponent(urlLargaConQuery)}`;
+                
+                const respuesta = await fetch(apiUrl);
+                const data = await respuesta.json();
+
+                let enlaceFinal = urlLargaConQuery;
+
+                if (data && data.shorturl) {
+                    enlaceFinal = data.shorturl;
+                }
+
+                await navigator.clipboard.writeText(enlaceFinal);
+                alert(`¡Enlace corto copiado al portapapeles!\n\n${enlaceFinal}`);
+
+            } catch (err) {
+                console.error("Error al acortar el enlace:", err);
+                alert("No se pudo conectar con el servicio acortador. Revisa tu conexión.");
             }
         }
+
+        function generarEnlaceCompartirActual() {
+            generarEnlaceCompartir(repertorioActual);
+        }
         
-        // --- LECTURA DEL ENLACE CORTO AL ABRIR LA WEB ---
+        // --- LECTURA DEL ENLACE AL ABRIR LA WEB (SOPORTA ?r= Y #r=) ---
         function comprobarYProcesarEnlaceCompartido() {
-            const hash = window.location.hash;
-            if (hash.startsWith('#r=')) {
+            let comprimido = null;
+
+            // 1. Buscamos primero en el parámetro URL (?r=)
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('r')) {
+                comprimido = urlParams.get('r');
+            } 
+            // 2. Si no está en '?', buscamos en el hash (#r=) por compatibilidad
+            else if (window.location.hash.startsWith('#r=')) {
+                comprimido = window.location.hash.replace('#r=', '');
+            }
+
+            if (comprimido) {
                 try {
-                    const comprimido = hash.replace('#r=', '');
                     const jsonStr = LZString.decompressFromEncodedURIComponent(comprimido);
                     if (!jsonStr) return;
-                    
+
                     const datos = JSON.parse(jsonStr);
-        
-                    if (datos && datos.n && datos.c) {
-                        // Reconstruimos el formato interno desde los IDs ligeros
-                        const cancionesReconstruidas = datos.c.map(item => {
-                            // Soporte compatible tanto si viene en formato array [id, enlazada] como si fuera objeto antiguo
-                            if (Array.isArray(item)) {
-                                return { id: item[0], enlazada: Boolean(item[1]) };
-                            }
-                            return item;
-                        });
-        
-                        repertorioActual = {
-                            id: Date.now(),
-                            nombre: `${datos.n} (Compartido)`,
-                            canciones: cancionesReconstruidas
-                        };
-        
+
+                    if (datos) {
+                        repertorioActual = datos;
+
+                        // Limpiamos la URL visualmente para dejar la barra de direcciones limpia
+                        history.replaceState(null, null, window.location.pathname);
+
                         renderBaseGeneralList();
                         render();
-                        history.replaceState(null, null, window.location.pathname);
-                        
-                        setTimeout(() => alert(`¡Repertorio "${datos.n}" cargado con éxito!`), 300);
+
+                        setTimeout(() => alert(`¡Repertorio "${datos.nombre || 'Compartido'}" cargado con éxito!`), 300);
                     }
-                } catch (e) { 
-                    console.error("Error al descomprimir enlace:", e); 
+                } catch (e) {
+                    console.error("Error al descomprimir datos del enlace:", e);
                 }
             }
         }
