@@ -547,37 +547,31 @@
             }
         }
 
-        // --- SISTEMA DE ENLACES CORTOS (COMPRESIÓN LZ-STRING) ---
+        // --- SISTEMA DE ENLACES ULTRA CORTOS (SOLO IDs Y ESTADOS) ---
         function generarEnlaceCompartir(repertorio) {
             try {
-                const datosEmpaquetados = {
+                // En lugar de enviar todo el objeto de las canciones, 
+                // enviamos solo un array ligero: [ [id1, enlazada1], [id2, enlazada2], ... ]
+                const estructuraLigera = {
                     n: repertorio.nombre,
-                    c: repertorio.canciones,
-                    d: repertorio.canciones.map(item => cancionesGeneral.find(c => c.id === item.id)).filter(Boolean)
+                    c: repertorio.canciones.map(item => [item.id, item.enlazada ? 1 : 0])
                 };
-
-                const jsonStr = JSON.stringify(datosEmpaquetados);
+        
+                const jsonStr = JSON.stringify(estructuraLigera);
                 const comprimido = LZString.compressToEncodedURIComponent(jsonStr);
                 const urlCompartir = `${window.location.origin}${window.location.pathname}#r=${comprimido}`;
                 
                 navigator.clipboard.writeText(urlCompartir).then(() => {
-                    alert(`¡Enlace corto copiado con éxito!\n\nRepertorio: "${repertorio.nombre}"`);
+                    alert(`¡Enlace corto copiado al portapapeles!\n\nRepertorio: "${repertorio.nombre}"`);
                 }).catch(() => {
-                    prompt("Copia este enlace corto:", urlCompartir);
+                    prompt("Copia este enlace:", urlCompartir);
                 });
             } catch (err) { 
-                alert("Error al comprimir y generar el enlace."); 
+                alert("Error al generar el enlace corto."); 
             }
         }
-
-        function generarEnlaceCompartirActual() {
-            if (repertorioActual.canciones.length === 0) {
-                alert("Añade algunas canciones al repertorio antes de compartirlo.");
-                return;
-            }
-            generarEnlaceCompartir(repertorioActual);
-        }
-
+        
+        // --- LECTURA DEL ENLACE CORTO AL ABRIR LA WEB ---
         function comprobarYProcesarEnlaceCompartido() {
             const hash = window.location.hash;
             if (hash.startsWith('#r=')) {
@@ -587,28 +581,32 @@
                     if (!jsonStr) return;
                     
                     const datos = JSON.parse(jsonStr);
-
+        
                     if (datos && datos.n && datos.c) {
-                        if (datos.d && Array.isArray(datos.d)) {
-                            datos.d.forEach(cExt => {
-                                if (!cancionesGeneral.some(c => c.id === cExt.id)) cancionesGeneral.push(cExt);
-                            });
-                            localStorage.setItem('FR_canciones', JSON.stringify(cancionesGeneral));
-                        }
-
+                        // Reconstruimos el formato interno desde los IDs ligeros
+                        const cancionesReconstruidas = datos.c.map(item => {
+                            // Soporte compatible tanto si viene en formato array [id, enlazada] como si fuera objeto antiguo
+                            if (Array.isArray(item)) {
+                                return { id: item[0], enlazada: Boolean(item[1]) };
+                            }
+                            return item;
+                        });
+        
                         repertorioActual = {
                             id: Date.now(),
                             nombre: `${datos.n} (Compartido)`,
-                            canciones: datos.c
+                            canciones: cancionesReconstruidas
                         };
-
+        
                         renderBaseGeneralList();
                         render();
                         history.replaceState(null, null, window.location.pathname);
                         
                         setTimeout(() => alert(`¡Repertorio "${datos.n}" cargado con éxito!`), 300);
                     }
-                } catch (e) { console.error("Error al descomprimir enlace:", e); }
+                } catch (e) { 
+                    console.error("Error al descomprimir enlace:", e); 
+                }
             }
         }
 
